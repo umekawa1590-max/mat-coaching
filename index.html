@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -6,69 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101d38">
 <title>MAT COACHING</title>
-
 <style>
 :root{
-  --navy:#101d38;
-  --navy2:#203b65;
-  --blue:#3979df;
-  --green:#169b76;
-  --bg:#f3f6fb;
-  --white:#fff;
-  --text:#202c40;
-  --muted:#718096;
-  --border:#dfe6f0;
-  --red:#d95765;
+--navy:#101d38;--navy2:#203b65;--blue:#3979df;--green:#169b76;
+--bg:#f3f6fb;--white:#fff;--text:#202c40;--muted:#718096;
+--border:#dfe6f0;--red:#d95765;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:Arial,"Noto Sans JP",sans-serif;
-}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,"Noto Sans JP",sans-serif}
 button,input,select{font:inherit}
 button{cursor:pointer}
-header{
-  position:sticky;top:0;z-index:10;
-  background:var(--navy);color:white;
-  padding:15px 20px;
-  display:flex;align-items:center;
-  justify-content:space-between;gap:10px;
-  box-shadow:0 3px 15px #101d3825;
-}
+header{position:sticky;top:0;z-index:10;background:var(--navy);color:white;padding:15px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 3px 15px #101d3825}
 .logo{font-weight:900;font-size:21px;letter-spacing:1px}
 .logo span{color:#77aaff}
 nav{display:flex;gap:7px;flex-wrap:wrap}
-.navbtn{
-  background:#ffffff15;color:white;
-  border:1px solid #ffffff55;border-radius:8px;
-  padding:8px 12px;font-size:12px;
-}
+.navbtn{background:#ffffff15;color:white;border:1px solid #ffffff55;border-radius:8px;padding:8px 12px;font-size:12px}
 main{max-width:1150px;margin:auto;padding:22px 16px 60px}
 .page{display:none}
 .page.active{display:block}
-.hero{
-  background:linear-gradient(120deg,#101d38,#31588f);
-  color:white;padding:27px;border-radius:16px;
-  margin-bottom:22px;
-}
+.hero{background:linear-gradient(120deg,#101d38,#31588f);color:white;padding:27px;border-radius:16px;margin-bottom:22px}
 .hero h1{margin:0 0 9px;font-size:27px}
 .hero p{margin:0;color:#d8e4f5;line-height:1.8}
 .section-title{font-size:19px;font-weight:800;margin:23px 0 13px}
 .muted{font-size:13px;color:var(--muted);line-height:1.7}
-.panel{
-  background:white;border:1px solid var(--border);
-  border-radius:13px;padding:17px;margin-bottom:15px;
-}
+.panel{background:white;border:1px solid var(--border);border-radius:13px;padding:17px;margin-bottom:15px}
 .panel h3{margin:0 0 13px;font-size:16px}
-.input{
-  width:100%;padding:12px;border:1px solid var(--border);
-  border-radius:8px;background:white;outline:none;
-}
+.input{width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;background:white;outline:none}
 .input:focus{border-color:var(--blue)}
-.btn{
-  border:0;background:var(--blue);color:white;
-  padding:10px 15px;border-radius:8px;font-weight:700;
-}
+.btn{border:0;background:var(--blue);color:white;padding:10px 15px;border-radius:8px;font-weight:700}
 .btn.secondary{background:#e8eef8;color:var(--navy)}
 .btn.green{background:var(--green)}
 .btn.red{background:var(--red)}
@@ -77,345 +41,263 @@ main{max-width:1150px;margin:auto;padding:22px 16px 60px}
 .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .studentbar{display:flex;gap:8px;max-width:480px}
 .studentbar input{flex:1;min-width:0}
-.tech-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(165px,1fr));
-  gap:12px;
-}
-.tech-card{
-  background:white;border:1px solid var(--border);
-  border-radius:12px;padding:16px;text-align:left;
-  min-height:125px;box-shadow:0 4px 15px #101d3809;
-  transition:.15s;
-}
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}
+.tech-card{background:white;border:1px solid var(--border);border-radius:12px;padding:16px;text-align:left;min-height:125px;box-shadow:0 4px 15px #101d3809;transition:.15s}
 .tech-card:hover{border-color:var(--blue);transform:translateY(-2px)}
-.tech-icon{font-size:29px;margin-bottom:9px}
 .tech-name{font-size:14px;font-weight:800;line-height:1.5}
 .tech-group{font-size:11px;color:var(--muted);margin-top:6px}
 .video-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.video-label{
-  color:white;padding:10px 12px;
-  font-size:13px;font-weight:800;border-radius:9px 9px 0 0;
-}
-.video-wrap{
-  background:#080f1d;position:relative;
-  min-height:190px;overflow:hidden;
-  border-radius:0 0 9px 9px;
-}
+.video-label{color:white;padding:10px 12px;font-size:13px;font-weight:800;border-radius:9px 9px 0 0}
+.video-wrap{background:#080f1d;position:relative;min-height:190px;overflow:hidden;border-radius:0 0 9px 9px}
 .video-wrap video{display:block;width:100%;max-height:400px;background:#080f1d}
-.video-wrap canvas{
-  position:absolute;left:0;top:0;width:100%;height:100%;
-  pointer-events:none;
-}
-.empty{
-  min-height:190px;display:flex;align-items:center;
-  justify-content:center;color:#d1dced;
-  text-align:center;padding:18px;font-size:13px;
-}
+.video-wrap canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.empty{min-height:190px;display:flex;align-items:center;justify-content:center;color:#d1dced;text-align:center;padding:18px;font-size:13px}
 .upload{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
-.file-label{
-  background:#e8eef8;color:var(--navy);
-  padding:9px 12px;border-radius:8px;
-  font-size:12px;font-weight:700;cursor:pointer;
-}
+.file-label{background:#e8eef8;color:var(--navy);padding:9px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
 .file-label input{display:none}
 .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.result{
-  padding:15px;border-radius:10px;
-  background:#effaf5;border:1px solid #d8efe5;
-}
+.result{padding:15px;border-radius:10px;background:#effaf5;border:1px solid #d8efe5}
 .result.improve{background:#fff7f0;border-color:#f2e2d6}
 .result h4{margin:0 0 9px}
 .result p{font-size:13px;line-height:1.8;margin:6px 0}
 .advice{padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;line-height:1.8}
 .advice:last-child{border:0}
-.notice{
-  padding:12px;background:#fff8e8;border:1px solid #f0dfb8;
-  border-radius:8px;color:#72551c;font-size:12px;line-height:1.8;
-  margin:12px 0;
-}
+.notice{padding:12px;background:#fff8e8;border:1px solid #f0dfb8;border-radius:8px;color:#72551c;font-size:12px;line-height:1.8;margin:12px 0}
 .status{font-size:12px;color:var(--muted);margin-top:9px;line-height:1.6}
-.history-item{
-  background:white;border:1px solid var(--border);
-  padding:13px;border-radius:9px;margin:8px 0;
-  display:flex;justify-content:space-between;align-items:center;gap:10px;
-}
+.history-item{background:white;border:1px solid var(--border);padding:13px;border-radius:9px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .history-item strong{font-size:14px}
 .tag{display:inline-block;background:#e8eef8;color:#294c80;padding:4px 8px;border-radius:5px;font-size:11px}
-.modal-bg{
-  display:none;position:fixed;inset:0;z-index:30;
-  background:#081326bb;align-items:center;justify-content:center;padding:15px;
-}
+.modal-bg{display:none;position:fixed;inset:0;z-index:30;background:#081326bb;align-items:center;justify-content:center;padding:15px}
 .modal-bg.show{display:flex}
-.modal{
-  width:min(600px,100%);max-height:90vh;overflow:auto;
-  background:white;border-radius:14px;padding:20px;
-}
+.modal{width:min(600px,100%);max-height:90vh;overflow:auto;background:white;border-radius:14px;padding:20px}
 .modal h2{margin-top:0}
 footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
 .hidden{display:none!important}
 @media(max-width:680px){
-  header{padding:12px;align-items:flex-start}
-  .logo{font-size:17px}
-  .navbtn{padding:7px;font-size:11px}
-  main{padding:15px 11px 45px}
-  .video-grid,.result-grid{grid-template-columns:1fr}
-  .hero{padding:21px}
-  .hero h1{font-size:22px}
+header{padding:12px;align-items:flex-start}
+.logo{font-size:17px}
+.navbtn{padding:7px;font-size:11px}
+main{padding:15px 11px 45px}
+.video-grid,.result-grid{grid-template-columns:1fr}
+.hero{padding:21px}
+.hero h1{font-size:22px}
 }
 @media print{
-  header,.no-print,footer{display:none!important}
-  body{background:white}
-  main{padding:0}
-  #analysisPage{display:block!important}
-  .page:not(#analysisPage){display:none!important}
-  .panel{box-shadow:none;break-inside:avoid}
+header,.no-print,footer{display:none!important}
+body{background:white}
+main{padding:0}
+#analysisPage{display:block!important}
+.page:not(#analysisPage){display:none!important}
+.panel{box-shadow:none;break-inside:avoid}
 }
 </style>
 </head>
-
 <body>
-
 <header>
-  <div class="logo">MAT <span>COACHING</span></div>
-  <nav>
-    <button class="navbtn" onclick="showPage('home')">ホーム</button>
-    <button class="navbtn" onclick="showHistory()">学習記録</button>
-    <button class="navbtn" onclick="teacherLogin()">先生用</button>
-  </nav>
+<div class="logo">MAT <span>COACHING</span></div>
+<nav>
+<button class="navbtn" onclick="showPage('home')">ホーム</button>
+<button class="navbtn" onclick="showHistory()">学習記録</button>
+<button class="navbtn" onclick="teacherLogin()">先生用</button>
+</nav>
 </header>
-
 <main>
-
-<!-- ホーム -->
 <section id="home" class="page active">
-  <div class="hero">
-    <h1>自分の動きを、もっとよく。</h1>
-    <p>見本動画と自分の動画を比べて、マット運動のポイントを見つけよう。</p>
-  </div>
-
-  <div class="studentbar">
-    <input id="studentName" class="input" placeholder="自分の名前を入力">
-    <button class="btn" onclick="saveStudent()">設定</button>
-  </div>
-  <p class="muted" id="studentMessage">名前を入力して学習を始めましょう。</p>
-
-  <div class="section-title">技を選ぼう</div>
-  <div id="techGrid" class="tech-grid"></div>
+<div class="hero">
+<h1>自分の動きを、もっとよく。</h1>
+<p>見本動画と自分の動画を比べて、マット運動のポイントを見つけよう。</p>
+</div>
+<div class="studentbar">
+<input id="studentName" class="input" placeholder="自分の名前を入力">
+<button class="btn" onclick="saveStudent()">設定</button>
+</div>
+<p class="muted" id="studentMessage">名前を入力して学習を始めましょう。</p>
+<div class="section-title">技を選ぼう</div>
+<div id="techGrid" class="tech-grid"></div>
 </section>
-
-<!-- 分析 -->
 <section id="analysis" class="page">
-  <div class="toolbar no-print">
-    <button class="btn secondary" onclick="showPage('home')">← 技の選択に戻る</button>
-    <span class="tag" id="techGroup"></span>
-  </div>
-
-  <div class="section-title" id="techTitle">技の分析</div>
-  <p class="muted">見本動画と自分の動画を読み込んで比較しましょう。</p>
-
-  <div class="video-grid">
-    <div>
-      <div class="video-label" style="background:#294c80">見本動画</div>
-      <div class="video-wrap">
-        <video id="refVideo" playsinline controls></video>
-        <canvas id="refCanvas"></canvas>
-        <div class="empty" id="refEmpty">見本動画を読み込んでください。</div>
-      </div>
-      <div class="upload no-print">
-        <label class="file-label">動画を選択<input type="file" accept="video/*" onchange="loadVideo(event,'ref')"></label>
-        <button class="btn secondary small" onclick="chooseReference()">登録済み見本</button>
-      </div>
-    </div>
-
-    <div>
-      <div class="video-label" style="background:#169b76">自分の動画</div>
-      <div class="video-wrap">
-        <video id="myVideo" playsinline controls></video>
-        <canvas id="myCanvas"></canvas>
-        <div class="empty" id="myEmpty">自分の動画を読み込んでください。</div>
-      </div>
-      <div class="upload no-print">
-        <label class="file-label">動画を選択<input type="file" accept="video/*" onchange="loadVideo(event,'my')"></label>
-        <button class="btn green small" onclick="openCamera()">カメラで撮影</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="panel no-print">
-    <h3>動画の再生・比較</h3>
-    <div class="toolbar">
-      <button class="btn" onclick="playBoth()">▶ 同時再生</button>
-      <button class="btn secondary" onclick="pauseBoth()">一時停止</button>
-      <button class="btn secondary" onclick="stepBoth(-1)">◀ 1秒戻る</button>
-      <button class="btn secondary" onclick="stepBoth(1)">1秒進む ▶</button>
-      <button class="btn secondary" onclick="setSpeed(.5)">0.5倍速</button>
-      <button class="btn secondary" onclick="setSpeed(1)">通常速度</button>
-    </div>
-    <div style="margin-top:13px">
-      <input id="seek" type="range" min="0" max="1000" value="0" style="width:100%" oninput="seekBoth(this.value)">
-    </div>
-    <p class="muted">再生位置を調整して、同じ動きの場面を比べてみましょう。</p>
-  </div>
-
-  <div class="panel no-print">
-    <h3>骨格表示・姿勢分析</h3>
-    <div class="toolbar">
-      <button class="btn" id="analyzeBtn" onclick="analyze()">骨格を検出して分析する</button>
-      <button class="btn secondary" onclick="toggleSkeleton()">骨格表示 ON / OFF</button>
-    </div>
-    <div class="status" id="analysisStatus">動画を2つ読み込んでから分析してください。</div>
-    <div class="notice">姿勢分析にはインターネット接続が必要です。分析機能が使えない場合でも、動画の再生や比較は利用できます。</div>
-  </div>
-
-  <div class="panel" id="report">
-    <h3>分析結果</h3>
-    <p class="muted" id="reportIntro">分析すると、良いところや改善のポイントが表示されます。</p>
-    <div class="result-grid">
-      <div class="result">
-        <h4>◎ 良いところ</h4>
-        <div id="good"><p class="muted">分析後に表示されます。</p></div>
-      </div>
-      <div class="result improve">
-        <h4>△ もっとよくするポイント</h4>
-        <div id="improve"><p class="muted">分析後に表示されます。</p></div>
-      </div>
-    </div>
-    <div class="section-title">具体的なアドバイス</div>
-    <div id="advice"><p class="muted">分析後に表示されます。</p></div>
-    <div class="toolbar no-print" style="margin-top:15px">
-      <button class="btn green" onclick="saveAnalysis()">学習記録に保存</button>
-      <button class="btn secondary" onclick="window.print()">PDF・印刷</button>
-      <button class="btn secondary" onclick="saveImage()">画像で保存</button>
-    </div>
-  </div>
+<div class="toolbar no-print">
+<button class="btn secondary" onclick="showPage('home')">← 技の選択に戻る</button>
+<span class="tag" id="techGroup"></span>
+</div>
+<div class="section-title" id="techTitle">技の分析</div>
+<p class="muted">見本動画と自分の動画を読み込んで比較しましょう。</p>
+<div class="video-grid">
+<div>
+<div class="video-label" style="background:#294c80">見本動画</div>
+<div class="video-wrap">
+<video id="refVideo" playsinline controls></video>
+<canvas id="refCanvas"></canvas>
+<div class="empty" id="refEmpty">見本動画を読み込んでください。</div>
+</div>
+<div class="upload no-print">
+<label class="file-label">動画を選択<input type="file" accept="video/*" onchange="loadVideo(event,'ref')"></label>
+<button class="btn secondary small" onclick="chooseReference()">登録済み見本</button>
+</div>
+</div>
+<div>
+<div class="video-label" style="background:#169b76">自分の動画</div>
+<div class="video-wrap">
+<video id="myVideo" playsinline controls></video>
+<canvas id="myCanvas"></canvas>
+<div class="empty" id="myEmpty">自分の動画を読み込んでください。</div>
+</div>
+<div class="upload no-print">
+<label class="file-label">動画を選択<input type="file" accept="video/*" onchange="loadVideo(event,'my')"></label>
+<button class="btn green small" onclick="openCamera()">カメラで撮影</button>
+</div>
+</div>
+</div>
+<div class="panel no-print">
+<h3>動画の再生・比較</h3>
+<div class="toolbar">
+<button class="btn" onclick="playBoth()">▶ 同時再生</button>
+<button class="btn secondary" onclick="pauseBoth()">一時停止</button>
+<button class="btn secondary" onclick="stepBoth(-1)">◀ 1秒戻る</button>
+<button class="btn secondary" onclick="stepBoth(1)">1秒進む ▶</button>
+<button class="btn secondary" onclick="setSpeed(.5)">0.5倍速</button>
+<button class="btn secondary" onclick="setSpeed(1)">通常速度</button>
+</div>
+<div style="margin-top:13px">
+<input id="seek" type="range" min="0" max="1000" value="0" style="width:100%" oninput="seekBoth(this.value)">
+</div>
+<p class="muted">再生位置を調整して、同じ動きの場面を比べてみましょう。</p>
+</div>
+<div class="panel no-print">
+<h3>骨格表示・姿勢分析</h3>
+<div class="toolbar">
+<button class="btn" id="analyzeBtn" onclick="analyze()">骨格を検出して分析する</button>
+<button class="btn secondary" onclick="toggleSkeleton()">骨格表示 ON / OFF</button>
+</div>
+<div class="status" id="analysisStatus">動画を2つ読み込んでから分析してください。</div>
+<div class="notice">姿勢分析にはインターネット接続が必要です。分析機能が使えない場合でも、動画の再生や比較は利用できます。</div>
+</div>
+<div class="panel" id="report">
+<h3>分析結果</h3>
+<p class="muted" id="reportIntro">分析すると、良いところや改善のポイントが表示されます。</p>
+<div class="result-grid">
+<div class="result">
+<h4>◎ 良いところ</h4>
+<div id="good"><p class="muted">分析後に表示されます。</p></div>
+</div>
+<div class="result improve">
+<h4>△ もっとよくするポイント</h4>
+<div id="improve"><p class="muted">分析後に表示されます。</p></div>
+</div>
+</div>
+<div class="section-title">具体的なアドバイス</div>
+<div id="advice"><p class="muted">分析後に表示されます。</p></div>
+<div class="toolbar no-print" style="margin-top:15px">
+<button class="btn green" onclick="saveAnalysis()">学習記録に保存</button>
+<button class="btn secondary" onclick="window.print()">PDF・印刷</button>
+<button class="btn secondary" onclick="saveImage()">画像で保存</button>
+</div>
+</div>
 </section>
-
-<!-- 学習記録 -->
 <section id="history" class="page">
-  <button class="btn secondary" onclick="showPage('home')">← ホーム</button>
-  <div class="section-title">学習記録</div>
-  <p class="muted">この端末に保存した記録です。</p>
-  <div id="historyList"></div>
+<button class="btn secondary" onclick="showPage('home')">← ホーム</button>
+<div class="section-title">学習記録</div>
+<p class="muted">この端末に保存した記録です。</p>
+<div id="historyList"></div>
 </section>
-
-<!-- 先生用 -->
 <section id="teacher" class="page">
-  <button class="btn secondary" onclick="showPage('home')">← ホーム</button>
-  <div class="section-title">先生用管理画面</div>
-  <div class="notice">暗証番号はこの端末内の簡易ロックです。強固な認証機能ではありません。</div>
-
-  <div class="panel">
-    <h3>見本動画を登録する</h3>
-    <p class="muted">技ごとに見本動画を登録できます。</p>
-    <label>技の種類</label>
-    <select id="teacherTech" class="input" style="margin:8px 0"></select>
-    <label>動画の名前</label>
-    <input id="refName" class="input" placeholder="例：前転の基本" style="margin:8px 0">
-    <label>動画ファイル</label>
-    <input id="refFile" class="input" type="file" accept="video/*" style="margin:8px 0">
-    <button class="btn" onclick="registerReference()">見本動画を登録</button>
-  </div>
-
-  <div class="panel">
-    <h3>登録済み見本動画</h3>
-    <div id="teacherReferences"></div>
-  </div>
-
-  <div class="panel">
-    <h3>見本動画セットの書き出し・読み込み</h3>
-    <div class="toolbar">
-      <button class="btn" onclick="exportReferences()">ZIPを書き出す</button>
-      <label class="file-label">ZIPを読み込む<input type="file" accept=".zip" onchange="importReferences(event)"></label>
-    </div>
-    <p class="muted">ZIP機能はJSZipを必要に応じて読み込みます。</p>
-  </div>
-
-  <div class="panel">
-    <h3>技を追加する</h3>
-    <input id="newTech" class="input" placeholder="追加する技の名前">
-    <select id="newGroup" class="input" style="margin:8px 0">
-      <option>回転系：接転技群</option>
-      <option>回転系：ほん転技群</option>
-      <option>巧技系：平均立ち技群</option>
-      <option>巧技系：倒立</option>
-      <option>先生が追加した技</option>
-    </select>
-    <button class="btn" onclick="addTech()">技を追加する</button>
-  </div>
-
-  <div class="panel">
-    <h3>暗証番号の変更</h3>
-    <input id="newPin" type="password" class="input" placeholder="新しい暗証番号">
-    <button class="btn secondary" style="margin-top:8px" onclick="changePin()">変更する</button>
-  </div>
+<button class="btn secondary" onclick="showPage('home')">← ホーム</button>
+<div class="section-title">先生用管理画面</div>
+<div class="notice">暗証番号はこの端末内の簡易ロックです。強固な認証機能ではありません。</div>
+<div class="panel">
+<h3>見本動画を登録する</h3>
+<p class="muted">技ごとに見本動画を登録できます。</p>
+<label>技の種類</label>
+<select id="teacherTech" class="input" style="margin:8px 0"></select>
+<label>動画の名前</label>
+<input id="refName" class="input" placeholder="例：前転の基本" style="margin:8px 0">
+<label>動画ファイル</label>
+<input id="refFile" class="input" type="file" accept="video/*" style="margin:8px 0">
+<button class="btn" onclick="registerReference()">見本動画を登録</button>
+</div>
+<div class="panel">
+<h3>登録済み見本動画</h3>
+<div id="teacherReferences"></div>
+</div>
+<div class="panel">
+<h3>見本動画セットの書き出し・読み込み</h3>
+<div class="toolbar">
+<button class="btn" onclick="exportReferences()">ZIPを書き出す</button>
+<label class="file-label">ZIPを読み込む<input type="file" accept=".zip" onchange="importReferences(event)"></label>
+</div>
+<p class="muted">ZIP機能はJSZipを必要に応じて読み込みます。</p>
+</div>
+<div class="panel">
+<h3>技を追加する</h3>
+<input id="newTech" class="input" placeholder="追加する技の名前">
+<select id="newGroup" class="input" style="margin:8px 0">
+<option>回転系：接転技群</option>
+<option>回転系：ほん転技群</option>
+<option>巧技系：平均立ち技群</option>
+<option>巧技系：倒立</option>
+<option>先生が追加した技</option>
+</select>
+<button class="btn" onclick="addTech()">技を追加する</button>
+</div>
+<div class="panel">
+<h3>暗証番号の変更</h3>
+<input id="newPin" type="password" class="input" placeholder="新しい暗証番号">
+<button class="btn secondary" style="margin-top:8px" onclick="changePin()">変更する</button>
+</div>
 </section>
-
 </main>
-
 <footer>MAT COACHING · マット運動 学習サポート</footer>
-
-<!-- カメラ -->
 <div class="modal-bg" id="cameraModal">
-  <div class="modal">
-    <h2>カメラ撮影</h2>
-    <video id="cameraPreview" autoplay playsinline muted style="width:100%;background:#111;border-radius:8px"></video>
-    <select id="cameraFacing" class="input" style="margin:10px 0" onchange="switchCamera()">
-      <option value="environment">背面カメラ</option>
-      <option value="user">前面カメラ</option>
-    </select>
-    <div class="toolbar">
-      <button class="btn green" id="recordBtn" onclick="startRecording()">● 撮影開始</button>
-      <button class="btn red" onclick="stopRecording()">撮影終了</button>
-      <button class="btn secondary" onclick="closeCamera()">閉じる</button>
-    </div>
-    <p class="muted" id="cameraStatus"></p>
-  </div>
+<div class="modal">
+<h2>カメラ撮影</h2>
+<video id="cameraPreview" autoplay playsinline muted style="width:100%;background:#111;border-radius:8px"></video>
+<select id="cameraFacing" class="input" style="margin:10px 0" onchange="switchCamera()">
+<option value="environment">背面カメラ</option>
+<option value="user">前面カメラ</option>
+</select>
+<div class="toolbar">
+<button class="btn green" id="recordBtn" onclick="startRecording()">● 撮影開始</button>
+<button class="btn red" onclick="stopRecording()">撮影終了</button>
+<button class="btn secondary" onclick="closeCamera()">閉じる</button>
 </div>
-
-<!-- 見本動画選択 -->
+<p class="muted" id="cameraStatus"></p>
+</div>
+</div>
 <div class="modal-bg" id="refModal">
-  <div class="modal">
-    <h2>登録済みの見本動画</h2>
-    <div id="refChoices"></div>
-    <button class="btn secondary" onclick="closeRefModal()">閉じる</button>
-  </div>
+<div class="modal">
+<h2>登録済みの見本動画</h2>
+<div id="refChoices"></div>
+<button class="btn secondary" onclick="closeRefModal()">閉じる</button>
 </div>
-
+</div>
 <script>
 "use strict";
-
-/* =========================================
-   基本データ
-   ========================================= */
-
 const DEFAULT_TECHS = [
- ["前転","回転系：接転技群","🔄"],
- ["開脚前転","回転系：接転技群","🤸"],
- ["倒立前転","回転系：接転技群","🙃"],
- ["伸膝前転","回転系：接転技群","🤸"],
- ["跳び前転","回転系：接転技群","🏃"],
- ["後転","回転系：接転技群","🔁"],
- ["開脚後転","回転系：接転技群","🤸"],
- ["伸膝後転","回転系：接転技群","🤸"],
- ["後転倒立","回転系：接転技群","🙃"],
- ["側方倒立回転","回転系：ほん転技群","↗️"],
- ["倒立ブリッジ","回転系：ほん転技群","🌉"],
- ["側方倒立回転跳び1/4ひねり（ロンダート）","回転系：ほん転技群","↪️"],
- ["前方倒立回転","回転系：ほん転技群","🤸"],
- ["前方倒立回転跳び","回転系：ほん転技群","🤸"],
- ["頭はねおき","回転系：ほん転技群","⬆️"],
- ["片足平均立ち","巧技系：平均立ち技群","🧍"],
- ["片足正面水平立ち","巧技系：平均立ち技群","🧍"],
- ["片足側面水平立ち","巧技系：平均立ち技群","🧍"],
- ["Y字バランス","巧技系：平均立ち技群","🩰"],
- ["倒立","巧技系：倒立","🙃"],
- ["倒立ひねり","巧技系：倒立","🔄"],
- ["頭倒立","巧技系：倒立","🙃"],
- ["補助倒立","巧技系：倒立","🤸"],
- ["補助倒立前転","その他・系統性を踏まえた技","🤸"]
+["前転","回転系：接転技群"],
+["開脚前転","回転系：接転技群"],
+["倒立前転","回転系：接転技群"],
+["伸膝前転","回転系：接転技群"],
+["跳び前転","回転系：接転技群"],
+["後転","回転系：接転技群"],
+["開脚後転","回転系：接転技群"],
+["伸膝後転","回転系：接転技群"],
+["後転倒立","回転系：接転技群"],
+["側方倒立回転","回転系：ほん転技群"],
+["倒立ブリッジ","回転系：ほん転技群"],
+["側方倒立回転跳び1/4ひねり（ロンダート）","回転系：ほん転技群"],
+["前方倒立回転","回転系：ほん転技群"],
+["前方倒立回転跳び","回転系：ほん転技群"],
+["頭はねおき","回転系：ほん転技群"],
+["片足平均立ち","巧技系：平均立ち技群"],
+["片足正面水平立ち","巧技系：平均立ち技群"],
+["片足側面水平立ち","巧技系：平均立ち技群"],
+["Y字バランス","巧技系：平均立ち技群"],
+["倒立","巧技系：倒立"],
+["倒立ひねり","巧技系：倒立"],
+["頭倒立","巧技系：倒立"],
+["補助倒立","巧技系：倒立"],
+["補助倒立前転","その他・系統性を踏まえた技"]
 ];
-
 let techs = [];
 let references = [];
 let history = [];
@@ -431,851 +313,720 @@ let cameraStream = null;
 let recorder = null;
 let chunks = [];
 let objectURLs = [];
-
-/* =========================================
-   初期化
-   ========================================= */
-
 function safeRead(key, fallback) {
-  try {
-    const value = localStorage.getItem(key);
-    return value ? JSON.parse(value) : fallback;
-  } catch(e) {
-    return fallback;
-  }
+try {
+const value = localStorage.getItem(key);
+return value ? JSON.parse(value) : fallback;
+} catch(e) {
+return fallback;
+}
 }
 function safeWrite(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  } catch(e) {
-    return false;
-  }
+try {
+localStorage.setItem(key, JSON.stringify(value));
+return true;
+} catch(e) {
+return false;
 }
-
+}
 function initialize() {
-  techs = safeRead("mat_techs", null);
-  if (!Array.isArray(techs) || !techs.length) {
-    techs = DEFAULT_TECHS.map(x=>({
-      name:x[0],group:x[1],icon:x[2],custom:false
-    }));
-    safeWrite("mat_techs",techs);
-  }
-
-  history = safeRead("mat_history",[]);
-  references = safeRead("mat_refs",[]);
-  document.getElementById("studentName").value =
-    safeRead("mat_student","");
-  updateStudentMessage();
-
-  renderTechs();
-  renderTeacherTechs();
-  openDatabase();
-
-  document.getElementById("analysisStatus").textContent =
-    "動画を2つ読み込んでから分析してください。";
+techs = safeRead("mat_techs", null);
+if (!Array.isArray(techs) || !techs.length) {
+techs = DEFAULT_TECHS.map(x=>({
+name:x[0],group:x[1],custom:false
+}));
+safeWrite("mat_techs",techs);
 }
-
+history = safeRead("mat_history",[]);
+references = safeRead("mat_refs",[]);
+document.getElementById("studentName").value =
+safeRead("mat_student","");
+updateStudentMessage();
+renderTechs();
+renderTeacherTechs();
+openDatabase();
+document.getElementById("analysisStatus").textContent =
+"動画を2つ読み込んでから分析してください。";
+}
 function showError(message) {
-  const el=document.getElementById("analysisStatus");
-  if(el) el.textContent=message;
+const el=document.getElementById("analysisStatus");
+if(el) el.textContent=message;
 }
-
 function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[c]);
+return String(value ?? "").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+})[c]);
 }
-
 function showPage(id) {
-  document.querySelectorAll(".page").forEach(el=>el.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  window.scrollTo(0,0);
+document.querySelectorAll(".page").forEach(el=>el.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+window.scrollTo(0,0);
 }
-
-/* =========================================
-   ホーム・技の選択
-   ========================================= */
-
 function renderTechs() {
-  const grid=document.getElementById("techGrid");
-  grid.innerHTML="";
-  techs.forEach(t=>{
-    const button=document.createElement("button");
-    button.className="tech-card";
-    button.innerHTML=
-      '<div class="tech-icon">'+escapeHTML(t.icon||"🤸")+'</div>'+
-      '<div class="tech-name">'+escapeHTML(t.name)+'</div>'+
-      '<div class="tech-group">'+escapeHTML(t.group)+'</div>';
-    button.addEventListener("click",()=>selectTech(t));
-    grid.appendChild(button);
-  });
+const grid=document.getElementById("techGrid");
+grid.innerHTML="";
+techs.forEach(t=>{
+const button=document.createElement("button");
+button.className="tech-card";
+button.innerHTML=
+'<div class="tech-name">'+escapeHTML(t.name)+'</div>'+
+'<div class="tech-group">'+escapeHTML(t.group)+'</div>';
+button.addEventListener("click",()=>selectTech(t));
+grid.appendChild(button);
+});
 }
-
 function saveStudent() {
-  const name=document.getElementById("studentName").value.trim();
-  safeWrite("mat_student",name);
-  updateStudentMessage();
+const name=document.getElementById("studentName").value.trim();
+safeWrite("mat_student",name);
+updateStudentMessage();
 }
 function updateStudentMessage() {
-  const name=document.getElementById("studentName").value.trim();
-  document.getElementById("studentMessage").textContent=
-    name ? "学習者："+name : "名前を入力して学習を始めましょう。";
+const name=document.getElementById("studentName").value.trim();
+document.getElementById("studentMessage").textContent =
+name ? "学習者："+name : "名前を入力して学習を始めましょう。";
 }
-
 function selectTech(tech) {
-  currentTech=tech;
-  document.getElementById("techTitle").textContent=tech.name+" の動きを比べよう";
-  document.getElementById("techGroup").textContent=tech.group;
-  clearReport();
-  showPage("analysis");
+currentTech=tech;
+document.getElementById("techTitle").textContent=tech.name+" の動きを比べよう";
+document.getElementById("techGroup").textContent=tech.group;
+clearReport();
+showPage("analysis");
 }
-
 function renderTeacherTechs() {
-  document.getElementById("teacherTech").innerHTML=
-    techs.map(t=>'<option value="'+escapeHTML(t.name)+'">'+escapeHTML(t.name)+'</option>').join("");
+document.getElementById("teacherTech").innerHTML =
+techs.map(t=>'<option value="'+escapeHTML(t.name)+'">'+escapeHTML(t.name)+'</option>').join("");
 }
-
 function addTech() {
-  const name=document.getElementById("newTech").value.trim();
-  const group=document.getElementById("newGroup").value;
-  if(!name){alert("技の名前を入力してください。");return;}
-  if(techs.some(t=>t.name===name)){alert("同じ名前の技がすでにあります。");return;}
-  techs.push({name,group,icon:"🤸",custom:true});
-  safeWrite("mat_techs",techs);
-  document.getElementById("newTech").value="";
-  renderTechs();
-  renderTeacherTechs();
-  alert("技を追加しました。");
+const name=document.getElementById("newTech").value.trim();
+const group=document.getElementById("newGroup").value;
+if(!name){alert("技の名前を入力してください。");return;}
+if(techs.some(t=>t.name===name)){alert("同じ名前の技がすでにあります。");return;}
+techs.push({name,group,custom:true});
+safeWrite("mat_techs",techs);
+document.getElementById("newTech").value="";
+renderTechs();
+renderTeacherTechs();
+alert("技を追加しました。");
 }
-
-/* =========================================
-   動画読み込み
-   ========================================= */
-
 function setVideo(which,url) {
-  const video=document.getElementById(which==="ref"?"refVideo":"myVideo");
-  const empty=document.getElementById(which==="ref"?"refEmpty":"myEmpty");
-
-  if(which==="ref") refURL=url;
-  else myURL=url;
-
-  video.src=url;
-  video.load();
-  empty.classList.add("hidden");
-
-  video.onloadedmetadata=()=>{
-    clearCanvas(which);
-  };
+const video=document.getElementById(which==="ref"?"refVideo":"myVideo");
+const empty=document.getElementById(which==="ref"?"refEmpty":"myEmpty");
+if(which==="ref") refURL=url;
+else myURL=url;
+video.src=url;
+video.load();
+empty.classList.add("hidden");
+video.onloadedmetadata=()=>{
+clearCanvas(which);
+};
 }
-
 function loadVideo(event,which) {
-  const file=event.target.files && event.target.files[0];
-  if(!file)return;
-  if(!file.type.startsWith("video/")){
-    alert("動画ファイルを選択してください。");
-    event.target.value="";
-    return;
-  }
-  const url=URL.createObjectURL(file);
-  objectURLs.push(url);
-  setVideo(which,url);
-  event.target.value="";
+const file=event.target.files && event.target.files[0];
+if(!file)return;
+if(!file.type.startsWith("video/")){
+alert("動画ファイルを選択してください。");
+event.target.value="";
+return;
 }
-
+const url=URL.createObjectURL(file);
+objectURLs.push(url);
+setVideo(which,url);
+event.target.value="";
+}
 function playBoth() {
-  const a=document.getElementById("refVideo");
-  const b=document.getElementById("myVideo");
-  if(!a.src||!b.src){
-    alert("見本動画と自分の動画を両方読み込んでください。");
-    return;
-  }
-  a.play().catch(()=>{});
-  b.play().catch(()=>{});
+const a=document.getElementById("refVideo");
+const b=document.getElementById("myVideo");
+if(!a.src||!b.src){
+alert("見本動画と自分の動画を両方読み込んでください。");
+return;
+}
+a.play().catch(()=>{});
+b.play().catch(()=>{});
 }
 function pauseBoth() {
-  document.getElementById("refVideo").pause();
-  document.getElementById("myVideo").pause();
+document.getElementById("refVideo").pause();
+document.getElementById("myVideo").pause();
 }
 function stepBoth(amount) {
-  ["refVideo","myVideo"].forEach(id=>{
-    const v=document.getElementById(id);
-    if(v.src)v.currentTime=Math.max(0,Math.min(v.duration||0,v.currentTime+amount));
-  });
+["refVideo","myVideo"].forEach(id=>{
+const v=document.getElementById(id);
+if(v.src)v.currentTime=Math.max(0,Math.min(v.duration||0,v.currentTime+amount));
+});
 }
 function setSpeed(speed) {
-  document.getElementById("refVideo").playbackRate=speed;
-  document.getElementById("myVideo").playbackRate=speed;
+document.getElementById("refVideo").playbackRate=speed;
+document.getElementById("myVideo").playbackRate=speed;
 }
 function seekBoth(value) {
-  ["refVideo","myVideo"].forEach(id=>{
-    const v=document.getElementById(id);
-    if(v.duration)v.currentTime=(Number(value)/1000)*v.duration;
-  });
+["refVideo","myVideo"].forEach(id=>{
+const v=document.getElementById(id);
+if(v.duration)v.currentTime=(Number(value)/1000)*v.duration;
+});
 }
 function updateSeek() {
-  const v=document.getElementById("myVideo");
-  if(v.duration && !document.getElementById("seek").matches(":active")) {
-    document.getElementById("seek").value=
-      Math.round(v.currentTime/v.duration*1000);
-  }
-  requestAnimationFrame(updateSeek);
+const v=document.getElementById("myVideo");
+if(v.duration && !document.getElementById("seek").matches(":active")) {
+document.getElementById("seek").value =
+Math.round(v.currentTime/v.duration*1000);
 }
-
-/* =========================================
-   IndexedDB：見本動画保存
-   ========================================= */
-
+requestAnimationFrame(updateSeek);
+}
 function openDatabase() {
-  if(!("indexedDB" in window))return;
-  try {
-    const request=indexedDB.open("MAT_COACHING_DB",1);
-    request.onupgradeneeded=()=>{
-      const d=request.result;
-      if(!d.objectStoreNames.contains("refs")){
-        d.createObjectStore("refs",{keyPath:"id",autoIncrement:true});
-      }
-    };
-    request.onsuccess=()=>{
-      db=request.result;
-      dbReady=true;
-    };
-    request.onerror=()=>{dbReady=false;};
-  } catch(e) {
-    dbReady=false;
-  }
+if(!("indexedDB" in window))return;
+try {
+const request=indexedDB.open("MAT_COACHING_DB",1);
+request.onupgradeneeded=()=>{
+const d=request.result;
+if(!d.objectStoreNames.contains("refs")){
+d.createObjectStore("refs",{keyPath:"id",autoIncrement:true});
 }
-
+};
+request.onsuccess=()=>{
+db=request.result;
+dbReady=true;
+};
+request.onerror=()=>{dbReady=false;};
+} catch(e) {
+dbReady=false;
+}
+}
 function saveReferenceBlob(blob,tech,name) {
-  return new Promise((resolve,reject)=>{
-    if(!dbReady||!db){reject(new Error("保存機能を利用できません"));return;}
-    const tx=db.transaction("refs","readwrite");
-    const request=tx.objectStore("refs").add({
-      tech,name,blob,created:new Date().toISOString()
-    });
-    request.onsuccess=()=>resolve(request.result);
-    request.onerror=()=>reject(request.error);
-  });
+return new Promise((resolve,reject)=>{
+if(!dbReady||!db){reject(new Error("保存機能を利用できません"));return;}
+const tx=db.transaction("refs","readwrite");
+const request=tx.objectStore("refs").add({
+tech,name,blob,created:new Date().toISOString()
+});
+request.onsuccess=()=>resolve(request.result);
+request.onerror=()=>reject(request.error);
+});
 }
-
 function getReferenceBlobs() {
-  return new Promise((resolve,reject)=>{
-    if(!dbReady||!db){resolve([]);return;}
-    const tx=db.transaction("refs","readonly");
-    const request=tx.objectStore("refs").getAll();
-    request.onsuccess=()=>resolve(request.result||[]);
-    request.onerror=()=>reject(request.error);
-  });
+return new Promise((resolve,reject)=>{
+if(!dbReady||!db){resolve([]);return;}
+const tx=db.transaction("refs","readonly");
+const request=tx.objectStore("refs").getAll();
+request.onsuccess=()=>resolve(request.result||[]);
+request.onerror=()=>reject(request.error);
+});
 }
-
-/* =========================================
-   先生用画面
-   ========================================= */
-
 function teacherLogin() {
-  const pin=prompt("先生用暗証番号を入力してください。");
-  if(pin===null)return;
-  const saved=safeRead("mat_pin","1234");
-  if(pin!==saved){alert("暗証番号が違います。");return;}
-  renderTeacherReferences();
-  showPage("teacher");
+const pin=prompt("先生用暗証番号を入力してください。");
+if(pin===null)return;
+const saved=safeRead("mat_pin","1234");
+if(pin!==saved){alert("暗証番号が違います。");return;}
+renderTeacherReferences();
+showPage("teacher");
 }
-
 function changePin() {
-  const pin=document.getElementById("newPin").value.trim();
-  if(pin.length<4){alert("4文字以上で設定してください。");return;}
-  safeWrite("mat_pin",pin);
-  document.getElementById("newPin").value="";
-  alert("暗証番号を変更しました。");
+const pin=document.getElementById("newPin").value.trim();
+if(pin.length<4){alert("4文字以上で設定してください。");return;}
+safeWrite("mat_pin",pin);
+document.getElementById("newPin").value="";
+alert("暗証番号を変更しました。");
 }
-
 async function registerReference() {
-  const tech=document.getElementById("teacherTech").value;
-  const name=document.getElementById("refName").value.trim()||tech+"の見本";
-  const file=document.getElementById("refFile").files[0];
-  if(!file){alert("動画ファイルを選択してください。");return;}
-  if(!file.type.startsWith("video/")){alert("動画ファイルを選択してください。");return;}
-
-  try {
-    await saveReferenceBlob(file,tech,name);
-    alert("見本動画を登録しました。");
-    document.getElementById("refName").value="";
-    document.getElementById("refFile").value="";
-    renderTeacherReferences();
-  } catch(e) {
-    alert("動画を保存できませんでした。ブラウザの保存容量や設定を確認してください。");
-  }
+const tech=document.getElementById("teacherTech").value;
+const name=document.getElementById("refName").value.trim()||tech+"の見本";
+const file=document.getElementById("refFile").files[0];
+if(!file){alert("動画ファイルを選択してください。");return;}
+if(!file.type.startsWith("video/")){alert("動画ファイルを選択してください。");return;}
+try {
+await saveReferenceBlob(file,tech,name);
+alert("見本動画を登録しました。");
+document.getElementById("refName").value="";
+document.getElementById("refFile").value="";
+renderTeacherReferences();
+} catch(e) {
+alert("動画を保存できませんでした。ブラウザの保存容量や設定を確認してください。");
 }
-
+}
 async function renderTeacherReferences() {
-  const list=document.getElementById("teacherReferences");
-  list.innerHTML="";
-  const refs=await getReferenceBlobs();
-
-  if(!refs.length){
-    list.textContent="登録済み動画はありません。";
-    return;
-  }
-
-  refs.forEach(ref=>{
-    const div=document.createElement("div");
-    div.className="history-item";
-    const info=document.createElement("div");
-    info.innerHTML="<strong>"+escapeHTML(ref.name)+"</strong><br><span class='muted'>"+escapeHTML(ref.tech)+"</span>";
-    const del=document.createElement("button");
-    del.className="btn red small";
-    del.textContent="削除";
-    del.onclick=()=>deleteReference(ref.id);
-    div.append(info,del);
-    list.appendChild(div);
-  });
+const list=document.getElementById("teacherReferences");
+list.innerHTML="";
+const refs=await getReferenceBlobs();
+if(!refs.length){
+list.textContent="登録済み動画はありません。";
+return;
 }
-
+refs.forEach(ref=>{
+const div=document.createElement("div");
+div.className="history-item";
+const info=document.createElement("div");
+info.innerHTML="<strong>"+escapeHTML(ref.name)+"</strong><br><span class='muted'>"+escapeHTML(ref.tech)+"</span>";
+const del=document.createElement("button");
+del.className="btn red small";
+del.textContent="削除";
+del.onclick=()=>deleteReference(ref.id);
+div.append(info,del);
+list.appendChild(div);
+});
+}
 async function deleteReference(id) {
-  if(!confirm("この見本動画を削除しますか？"))return;
-  if(!dbReady||!db){alert("保存データベースを利用できません。");return;}
-  const tx=db.transaction("refs","readwrite");
-  tx.objectStore("refs").delete(id);
-  tx.oncomplete=renderTeacherReferences;
+if(!confirm("この見本動画を削除しますか？"))return;
+if(!dbReady||!db){alert("保存データベースを利用できません。");return;}
+const tx=db.transaction("refs","readwrite");
+tx.objectStore("refs").delete(id);
+tx.oncomplete=renderTeacherReferences;
 }
-
 async function chooseReference() {
-  if(!currentTech){alert("技を選択してください。");return;}
-  const refs=await getReferenceBlobs();
-  const matched=refs.filter(r=>r.tech===currentTech.name);
-  const area=document.getElementById("refChoices");
-  area.innerHTML="";
-
-  if(!matched.length){
-    area.textContent="この技の見本動画は登録されていません。";
-  }
-
-  matched.forEach(ref=>{
-    const b=document.createElement("button");
-    b.className="btn secondary";
-    b.style.display="block";
-    b.style.width="100%";
-    b.style.margin="8px 0";
-    b.textContent=ref.name;
-    b.onclick=()=>{
-      const url=URL.createObjectURL(ref.blob);
-      objectURLs.push(url);
-      setVideo("ref",url);
-      closeRefModal();
-    };
-    area.appendChild(b);
-  });
-  document.getElementById("refModal").classList.add("show");
+if(!currentTech){alert("技を選択してください。");return;}
+const refs=await getReferenceBlobs();
+const matched=refs.filter(r=>r.tech===currentTech.name);
+const area=document.getElementById("refChoices");
+area.innerHTML="";
+if(!matched.length){
+area.textContent="この技の見本動画は登録されていません。";
+}
+matched.forEach(ref=>{
+const b=document.createElement("button");
+b.className="btn secondary";
+b.style.display="block";
+b.style.width="100%";
+b.style.margin="8px 0";
+b.textContent=ref.name;
+b.onclick=()=>{
+const url=URL.createObjectURL(ref.blob);
+objectURLs.push(url);
+setVideo("ref",url);
+closeRefModal();
+};
+area.appendChild(b);
+});
+document.getElementById("refModal").classList.add("show");
 }
 function closeRefModal() {
-  document.getElementById("refModal").classList.remove("show");
+document.getElementById("refModal").classList.remove("show");
 }
-
-/* =========================================
-   ZIP書き出し・読み込み
-   ========================================= */
-
 async function loadJSZip() {
-  if(window.JSZip)return window.JSZip;
-  const script=document.createElement("script");
-  script.src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js";
-  document.head.appendChild(script);
-  await new Promise((resolve,reject)=>{
-    script.onload=resolve;
-    script.onerror=()=>reject(new Error("ZIPライブラリを読み込めません"));
-  });
-  return window.JSZip;
+if(window.JSZip)return window.JSZip;
+const script=document.createElement("script");
+script.src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js";
+document.head.appendChild(script);
+await new Promise((resolve,reject)=>{
+script.onload=resolve;
+script.onerror=()=>reject(new Error("ZIPライブラリを読み込めません"));
+});
+return window.JSZip;
 }
-
 async function exportReferences() {
-  try {
-    const JSZip=await loadJSZip();
-    const refs=await getReferenceBlobs();
-    if(!refs.length){alert("見本動画が登録されていません。");return;}
-    const zip=new JSZip();
-    const manifest=[];
-    for(let i=0;i<refs.length;i++){
-      const r=refs[i];
-      const filename="videos/"+i+".webm";
-      zip.file(filename,r.blob);
-      manifest.push({tech:r.tech,name:r.name,filename});
-    }
-    zip.file("manifest.json",JSON.stringify(manifest,null,2));
-    const blob=await zip.generateAsync({type:"blob"});
-    downloadBlob(blob,"MAT-COACHING-見本動画セット.zip");
-  } catch(e) {
-    alert("ZIPを書き出せませんでした。インターネット接続を確認してください。");
-  }
+try {
+const JSZip=await loadJSZip();
+const refs=await getReferenceBlobs();
+if(!refs.length){alert("見本動画が登録されていません。");return;}
+const zip=new JSZip();
+const manifest=[];
+for(let i=0;i<refs.length;i++){
+const r=refs[i];
+const filename="videos/"+i+".webm";
+zip.file(filename,r.blob);
+manifest.push({tech:r.tech,name:r.name,filename});
 }
-
+zip.file("manifest.json",JSON.stringify(manifest,null,2));
+const blob=await zip.generateAsync({type:"blob"});
+downloadBlob(blob,"MAT-COACHING-見本動画セット.zip");
+} catch(e) {
+alert("ZIPを書き出せませんでした。インターネット接続を確認してください。");
+}
+}
 async function importReferences(event) {
-  const file=event.target.files[0];
-  if(!file)return;
-  try {
-    const JSZip=await loadJSZip();
-    const zip=await JSZip.loadAsync(file);
-    const manifestFile=zip.file("manifest.json");
-    if(!manifestFile)throw new Error("manifest.jsonがありません");
-    const manifest=JSON.parse(await manifestFile.async("text"));
-
-    for(const item of manifest){
-      const f=zip.file(item.filename);
-      if(!f)continue;
-      const blob=await f.async("blob");
-      await saveReferenceBlob(blob,item.tech,item.name);
-    }
-    alert("見本動画セットを読み込みました。");
-    renderTeacherReferences();
-  } catch(e) {
-    alert("ZIPファイルを読み込めませんでした。");
-  }
-  event.target.value="";
+const file=event.target.files[0];
+if(!file)return;
+try {
+const JSZip=await loadJSZip();
+const zip=await JSZip.loadAsync(file);
+const manifestFile=zip.file("manifest.json");
+if(!manifestFile)throw new Error("manifest.jsonがありません");
+const manifest=JSON.parse(await manifestFile.async("text"));
+for(const item of manifest){
+const f=zip.file(item.filename);
+if(!f)continue;
+const blob=await f.async("blob");
+await saveReferenceBlob(blob,item.tech,item.name);
 }
-
+alert("見本動画セットを読み込みました。");
+renderTeacherReferences();
+} catch(e) {
+alert("ZIPファイルを読み込めませんでした。");
+}
+event.target.value="";
+}
 function downloadBlob(blob,name) {
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;a.download=name;a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),3000);
+const url=URL.createObjectURL(blob);
+const a=document.createElement("a");
+a.href=url;a.download=name;a.click();
+setTimeout(()=>URL.revokeObjectURL(url),3000);
 }
-
-/* =========================================
-   カメラ撮影
-   ========================================= */
-
 async function openCamera() {
-  if(!navigator.mediaDevices?.getUserMedia){
-    alert("このブラウザではカメラを利用できません。HTTPSまたはlocalhostで開いてください。");
-    return;
-  }
-  try {
-    cameraStream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:"environment"},audio:true
-    });
-    document.getElementById("cameraPreview").srcObject=cameraStream;
-    document.getElementById("cameraModal").classList.add("show");
-    document.getElementById("cameraStatus").textContent="周囲の安全を確認して撮影してください。";
-  } catch(e) {
-    alert("カメラを起動できませんでした。カメラの使用を許可してください。");
-  }
+if(!navigator.mediaDevices?.getUserMedia){
+alert("このブラウザではカメラを利用できません。HTTPSまたはlocalhostで開いてください。");
+return;
 }
-
+try {
+cameraStream=await navigator.mediaDevices.getUserMedia({
+video:{facingMode:"environment"},audio:true
+});
+document.getElementById("cameraPreview").srcObject=cameraStream;
+document.getElementById("cameraModal").classList.add("show");
+document.getElementById("cameraStatus").textContent="周囲の安全を確認して撮影してください。";
+} catch(e) {
+alert("カメラを起動できませんでした。カメラの使用を許可してください。");
+}
+}
 async function switchCamera() {
-  if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());
-  try {
-    cameraStream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:document.getElementById("cameraFacing").value},
-      audio:true
-    });
-    document.getElementById("cameraPreview").srcObject=cameraStream;
-  } catch(e) {
-    alert("カメラを切り替えられませんでした。");
-  }
+if(!cameraStream)return;
+cameraStream.getTracks().forEach(t=>t.stop());
+const facing=document.getElementById("cameraFacing").value;
+try {
+cameraStream=await navigator.mediaDevices.getUserMedia({
+video:{facingMode:facing},audio:true
+});
+document.getElementById("cameraPreview").srcObject=cameraStream;
+} catch(e) {
+alert("カメラを切り替えられませんでした。");
 }
-
+}
 function startRecording() {
-  if(!cameraStream){alert("カメラを起動してください。");return;}
-  if(!window.MediaRecorder){alert("このブラウザは動画撮影に対応していません。");return;}
-  chunks=[];
-  try {
-    recorder=new MediaRecorder(cameraStream);
-    recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
-    recorder.onstop=()=>{
-      const blob=new Blob(chunks,{type:recorder.mimeType||"video/webm"});
-      const url=URL.createObjectURL(blob);
-      objectURLs.push(url);
-      setVideo("my",url);
-      document.getElementById("cameraStatus").textContent="撮影した動画を読み込みました。";
-    };
-    recorder.start();
-    document.getElementById("recordBtn").disabled=true;
-    document.getElementById("cameraStatus").textContent="撮影中です。";
-  } catch(e) {
-    alert("撮影を開始できませんでした。");
-  }
+if(!cameraStream){alert("先にカメラを起動してください。");return;}
+chunks=[];
+let options={};
+if(MediaRecorder.isTypeSupported("video/webm;codecs=vp9")){
+options.mimeType="video/webm;codecs=vp9";
+}else if(MediaRecorder.isTypeSupported("video/webm")){
+options.mimeType="video/webm";
 }
-
+try {
+recorder=new MediaRecorder(cameraStream,options);
+recorder.ondataavailable=e=>{
+if(e.data&&e.data.size)chunks.push(e.data);
+};
+recorder.onstop=()=>{
+const blob=new Blob(chunks,{type:recorder.mimeType||"video/webm"});
+const url=URL.createObjectURL(blob);
+objectURLs.push(url);
+setVideo("my",url);
+document.getElementById("cameraStatus").textContent="撮影した動画を読み込みました。";
+document.getElementById("recordBtn").disabled=false;
+};
+recorder.start();
+document.getElementById("recordBtn").disabled=true;
+document.getElementById("cameraStatus").textContent="撮影中です。";
+} catch(e) {
+alert("録画を開始できませんでした。");
+}
+}
 function stopRecording() {
-  if(recorder&&recorder.state!=="inactive")recorder.stop();
-  document.getElementById("recordBtn").disabled=false;
+if(recorder&&recorder.state!=="inactive")recorder.stop();
 }
-
 function closeCamera() {
-  if(recorder&&recorder.state!=="inactive")recorder.stop();
-  if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());
-  cameraStream=null;
-  document.getElementById("cameraModal").classList.remove("show");
+if(recorder&&recorder.state!=="inactive")recorder.stop();
+if(cameraStream){
+cameraStream.getTracks().forEach(t=>t.stop());
+cameraStream=null;
 }
-
-/* =========================================
-   姿勢推定
-   外部ライブラリはここで初めて読み込む
-   ========================================= */
-
+document.getElementById("cameraPreview").srcObject=null;
+document.getElementById("cameraModal").classList.remove("show");
+}
 async function loadPoseDetector() {
-  if(poseDetector)return poseDetector;
-
-  showError("姿勢推定モデルを読み込んでいます。少し待ってください。");
-
-  const vision=await import(
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm"
-  );
-
-  const fileset=await vision.FilesetResolver.forVisionTasks(
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
-  );
-
-  poseDetector=await vision.PoseLandmarker.createFromOptions(fileset,{
-    baseOptions:{
-      modelAssetPath:
-      "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
-      delegate:"CPU"
-    },
-    runningMode:"VIDEO",
-    numPoses:1
-  });
-
-  return poseDetector;
+if(poseDetector)return poseDetector;
+const vision=await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14");
+const fileset=await vision.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
+poseDetector=await vision.PoseLandmarker.createFromOptions(fileset,{
+baseOptions:{
+modelAssetPath:"https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+delegate:"GPU"
+},
+runningMode:"VIDEO",
+numPoses:1
+});
+return poseDetector;
 }
-
 const BONES=[
- [11,12],[11,13],[13,15],[12,14],[14,16],
- [11,23],[12,24],[23,24],[23,25],[25,27],
- [24,26],[26,28],[27,29],[29,31],[28,30],[30,32]
+[11,12],[11,13],[13,15],[12,14],[14,16],
+[11,23],[12,24],[23,24],[23,25],[25,27],
+[24,26],[26,28],[27,29],[29,31],[28,30],[30,32]
 ];
-
 function clearCanvas(which) {
-  const canvas=document.getElementById(which==="ref"?"refCanvas":"myCanvas");
-  const ctx=canvas.getContext("2d");
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+const canvas=document.getElementById(which==="ref"?"refCanvas":"myCanvas");
+const ctx=canvas.getContext("2d");
+ctx.clearRect(0,0,canvas.width,canvas.height);
 }
-
 function drawSkeleton(which,video,landmarks) {
-  const canvas=document.getElementById(which==="ref"?"refCanvas":"myCanvas");
-  const ctx=canvas.getContext("2d");
-  if(!video.videoWidth)return;
-
-  canvas.width=video.videoWidth;
-  canvas.height=video.videoHeight;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  if(!skeletonOn||!landmarks)return;
-
-  ctx.strokeStyle="#31e6ae";
-  ctx.fillStyle="#ffce55";
-  ctx.lineWidth=Math.max(3,canvas.width/250);
-
-  BONES.forEach(([a,b])=>{
-    const p=landmarks[a],q=landmarks[b];
-    if(!p||!q||p.visibility<.35||q.visibility<.35)return;
-    ctx.beginPath();
-    ctx.moveTo(p.x*canvas.width,p.y*canvas.height);
-    ctx.lineTo(q.x*canvas.width,q.y*canvas.height);
-    ctx.stroke();
-  });
-
-  landmarks.forEach(p=>{
-    if(p.visibility<.35)return;
-    ctx.beginPath();
-    ctx.arc(p.x*canvas.width,p.y*canvas.height,Math.max(3,canvas.width/160),0,Math.PI*2);
-    ctx.fill();
-  });
+const canvas=document.getElementById(which==="ref"?"refCanvas":"myCanvas");
+const ctx=canvas.getContext("2d");
+if(!video.videoWidth)return;
+canvas.width=video.videoWidth;
+canvas.height=video.videoHeight;
+ctx.clearRect(0,0,canvas.width,canvas.height);
+if(!skeletonOn||!landmarks)return;
+ctx.strokeStyle="#31e6ae";
+ctx.fillStyle="#ffce55";
+ctx.lineWidth=Math.max(3,canvas.width/250);
+BONES.forEach(([a,b])=>{
+const p=landmarks[a],q=landmarks[b];
+if(!p||!q||p.visibility<.35||q.visibility<.35)return;
+ctx.beginPath();
+ctx.moveTo(p.x*canvas.width,p.y*canvas.height);
+ctx.lineTo(q.x*canvas.width,q.y*canvas.height);
+ctx.stroke();
+});
+landmarks.forEach(p=>{
+if(p.visibility<.35)return;
+ctx.beginPath();
+ctx.arc(p.x*canvas.width,p.y*canvas.height,Math.max(3,canvas.width/160),0,Math.PI*2);
+ctx.fill();
+});
 }
-
 function toggleSkeleton() {
-  skeletonOn=!skeletonOn;
-  if(!skeletonOn){
-    clearCanvas("ref");
-    clearCanvas("my");
-  } else if(currentResult?.landmarks){
-    drawSkeleton("ref",document.getElementById("refVideo"),currentResult.landmarks.ref);
-    drawSkeleton("my",document.getElementById("myVideo"),currentResult.landmarks.my);
-  }
+skeletonOn=!skeletonOn;
+if(!skeletonOn){
+clearCanvas("ref");
+clearCanvas("my");
+} else if(currentResult?.landmarks){
+drawSkeleton("ref",document.getElementById("refVideo"),currentResult.landmarks.ref);
+drawSkeleton("my",document.getElementById("myVideo"),currentResult.landmarks.my);
 }
-
+}
 function angle(a,b,c) {
-  const ab=[a.x-b.x,a.y-b.y];
-  const cb=[c.x-b.x,c.y-b.y];
-  const dot=ab[0]*cb[0]+ab[1]*cb[1];
-  const mag=Math.hypot(...ab)*Math.hypot(...cb);
-  if(!mag)return null;
-  return Math.acos(Math.max(-1,Math.min(1,dot/mag)))*180/Math.PI;
+const ab=[a.x-b.x,a.y-b.y];
+const cb=[c.x-b.x,c.y-b.y];
+const dot=ab[0]*cb[0]+ab[1]*cb[1];
+const mag=Math.hypot(...ab)*Math.hypot(...cb);
+if(!mag)return null;
+return Math.acos(Math.max(-1,Math.min(1,dot/mag)))*180/Math.PI;
 }
-
 function midpoint(a,b) {
-  if(!a||!b)return null;
-  return {x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+if(!a||!b)return null;
+return {x:(a.x+b.x)/2,y:(a.y+b.y)/2};
 }
-
 function getMetrics(lm) {
-  const shoulder=midpoint(lm[11],lm[12]);
-  const hip=midpoint(lm[23],lm[24]);
-  const ankle=midpoint(lm[27],lm[28]);
-  const knee=midpoint(lm[25],lm[26]);
-  const visible=lm.filter(p=>p.visibility>.5).length/lm.length;
-
-  return {
-    shoulder,hip,ankle,knee,visible,
-    trunk:shoulder&&hip&&ankle?angle(shoulder,hip,ankle):null,
-    kneeAngle:lm[23]&&lm[25]&&lm[27]?angle(lm[23],lm[25],lm[27]):null,
-    shoulderTilt:Math.abs(Math.atan2(lm[11].y-lm[12].y,lm[11].x-lm[12].x)*180/Math.PI)
-  };
+const shoulder=midpoint(lm[11],lm[12]);
+const hip=midpoint(lm[23],lm[24]);
+const ankle=midpoint(lm[27],lm[28]);
+const knee=midpoint(lm[25],lm[26]);
+const visible=lm.filter(p=>p.visibility>.5).length/lm.length;
+return {
+shoulder,hip,ankle,knee,visible,
+trunk:shoulder&&hip&&ankle?angle(shoulder,hip,ankle):null,
+kneeAngle:lm[23]&&lm[25]&&lm[27]?angle(lm[23],lm[25],lm[27]):null,
+shoulderTilt:Math.abs(Math.atan2(lm[11].y-lm[12].y,lm[11].x-lm[12].x)*180/Math.PI)
+};
 }
-
 function compareMetrics(ref,my) {
-  const good=[],improve=[],advice=[];
-  if(ref.visible<.55||my.visible<.55){
-    return {
-      good:["全身が映るように撮影できると、もっと詳しく比べられます。"],
-      improve:["体の一部が見えにくく、姿勢を十分に確認できませんでした。"],
-      advice:["全身が画面に入る位置にカメラを置きましょう。","カメラを固定して撮影すると、見本と比べやすくなります。"]
-    };
-  }
-
-  const td=ref.trunk!==null&&my.trunk!==null?Math.abs(ref.trunk-my.trunk):null;
-  const kd=ref.kneeAngle!==null&&my.kneeAngle!==null?Math.abs(ref.kneeAngle-my.kneeAngle):null;
-
-  if(td!==null){
-    if(td<15)good.push("体の中心部分の傾きが、見本に近くなっています。");
-    else improve.push("体の中心部分の傾きに違いが見られます。");
-  }
-  if(kd!==null){
-    if(kd<15)good.push("ひざの角度が、見本に近い状態です。");
-    else improve.push("ひざの曲がり方を見本と比べてみましょう。");
-  }
-  if(my.shoulderTilt<12)good.push("肩のラインが大きく傾かずに保たれています。");
-  else improve.push("肩のラインが傾いているようです。");
-
-  if(!good.length)good.push("見本と自分の姿勢を比べることができました。");
-  if(!improve.length)improve.push("今回確認できた姿勢では、大きな違いは見つかりませんでした。");
-
-  const tips={
-    "前転":[
-      "手をしっかりマットにつき、あごを引いて背中を丸めましょう。",
-      "後頭部から背中へ、順番にマットにつけることを意識しましょう。"
-    ],
-    "開脚前転":[
-      "前転の途中から両足を開くタイミングを意識しましょう。",
-      "最後は両手でマットを押して、立ち上がりましょう。"
-    ],
-    "後転":[
-      "おへそを見て背中を丸めましょう。",
-      "両手を耳の横に準備し、手のひらでマットを押しましょう。"
-    ],
-    "開脚後転":[
-      "後ろに回るときに両手を耳の横につきましょう。",
-      "足を左右に開き、手でマットを押して起き上がりましょう。"
-    ],
-    "側方倒立回転":[
-      "手をつく位置と足を振り上げる方向を確認しましょう。",
-      "両手と両足が順番にマットにつくことを意識しましょう。"
-    ],
-    "倒立":[
-      "手の真上に肩がくるように意識しましょう。",
-      "おなかに力を入れ、体をまっすぐに保ちましょう。"
-    ],
-    "Y字バランス":[
-      "軸足で床を押し、上半身を安定させましょう。",
-      "上げた足と両手の位置をゆっくり調整しましょう。"
-    ]
-  };
-
-  advice.push(...(tips[currentTech.name]||[
-    "技のポイントを一つずつ確認しながら練習しましょう。",
-    "見本と自分の動画を同じ場面で止めて、手足の位置を比べましょう。"
-  ]));
-  advice.push("まずは一つのポイントを意識して、もう一度撮影してみましょう。");
-
-  return {good,improve,advice};
+const good=[],improve=[],advice=[];
+if(ref.visible<.55||my.visible<.55){
+return {
+good:["全身が映るように撮影できると、もっと詳しく比べられます。"],
+improve:["体の一部が見えにくく、姿勢を十分に確認できませんでした。"],
+advice:["全身が画面に入る位置にカメラを置きましょう。","カメラを固定して撮影すると、見本と比べやすくなります。"]
+};
 }
-
+const td=ref.trunk!==null&&my.trunk!==null?Math.abs(ref.trunk-my.trunk):null;
+const kd=ref.kneeAngle!==null&&my.kneeAngle!==null?Math.abs(ref.kneeAngle-my.kneeAngle):null;
+if(td!==null){
+if(td<15)good.push("体の中心部分の傾きが、見本に近くなっています。");
+else improve.push("体の中心部分の傾きに違いが見られます。");
+}
+if(kd!==null){
+if(kd<15)good.push("ひざの角度が、見本に近い状態です。");
+else improve.push("ひざの曲がり方を見本と比べてみましょう。");
+}
+if(my.shoulderTilt<12)good.push("肩のラインが大きく傾かずに保たれています。");
+else improve.push("肩のラインが傾いているようです。");
+if(!good.length)good.push("見本と自分の姿勢を比べることができました。");
+if(!improve.length)improve.push("今回確認できた姿勢では、大きな違いは見つかりませんでした。");
+const tips={
+"前転":[
+"手をしっかりマットにつき、あごを引いて背中を丸めましょう。",
+"後頭部から背中へ、順番にマットにつけることを意識しましょう。"
+],
+"開脚前転":[
+"前転の途中から両足を開くタイミングを意識しましょう。",
+"最後は両手でマットを押して、立ち上がりましょう。"
+],
+"後転":[
+"おへそを見て背中を丸めましょう。",
+"両手を耳の横に準備し、手のひらでマットを押しましょう。"
+],
+"開脚後転":[
+"後ろに回るときに両手を耳の横につきましょう。",
+"足を左右に開き、手でマットを押して起き上がりましょう。"
+],
+"側方倒立回転":[
+"手をつく位置と足を振り上げる方向を確認しましょう。",
+"両手と両足が順番にマットにつくことを意識しましょう。"
+],
+"倒立":[
+"手の真上に肩がくるように意識しましょう。",
+"おなかに力を入れ、体をまっすぐに保ちましょう。"
+],
+"Y字バランス":[
+"軸足で床を押し、上半身を安定させましょう。",
+"上げた足と両手の位置をゆっくり調整しましょう。"
+]
+};
+advice.push(...(tips[currentTech.name]||[
+"技のポイントを一つずつ確認しながら練習しましょう。",
+"見本と自分の動画を同じ場面で止めて、手足の位置を比べましょう。"
+]));
+advice.push("まずは一つのポイントを意識して、もう一度撮影してみましょう。");
+return {good,improve,advice};
+}
 async function analyze() {
-  const ref=document.getElementById("refVideo");
-  const my=document.getElementById("myVideo");
-  const btn=document.getElementById("analyzeBtn");
-
-  if(!ref.src||!my.src){
-    alert("見本動画と自分の動画を両方読み込んでください。");
-    return;
-  }
-  if(!ref.videoWidth||!my.videoWidth){
-    alert("動画の読み込みが終わるまで待ってください。");
-    return;
-  }
-
-  btn.disabled=true;
-  try {
-    const detector=await loadPoseDetector();
-    const resultRef=detector.detectForVideo(ref,performance.now());
-    const resultMy=detector.detectForVideo(my,performance.now());
-    const lmRef=resultRef.landmarks?.[0];
-    const lmMy=resultMy.landmarks?.[0];
-
-    if(!lmRef||!lmMy){
-      showError("骨格を検出できませんでした。全身が映るように撮影してください。");
-      return;
-    }
-
-    drawSkeleton("ref",ref,lmRef);
-    drawSkeleton("my",my,lmMy);
-
-    const metricsRef=getMetrics(lmRef);
-    const metricsMy=getMetrics(lmMy);
-    const result=compareMetrics(metricsRef,metricsMy);
-
-    currentResult={
-      tech:currentTech.name,
-      student:document.getElementById("studentName").value.trim(),
-      date:new Date().toISOString(),
-      good:result.good,
-      improve:result.improve,
-      advice:result.advice,
-      landmarks:{ref:lmRef,my:lmMy}
-    };
-
-    renderReport(currentResult);
-    showError("分析が完了しました。ほかの場面でも比較してみましょう。");
-
-  } catch(e) {
-    console.error(e);
-    showError("姿勢推定を読み込めませんでした。インターネット接続を確認してください。動画の再生や比較は引き続き利用できます。");
-    alert("姿勢分析機能の読み込みに失敗しました。基本機能はそのまま利用できます。");
-  } finally {
-    btn.disabled=false;
-  }
+const ref=document.getElementById("refVideo");
+const my=document.getElementById("myVideo");
+const btn=document.getElementById("analyzeBtn");
+if(!ref.src||!my.src){
+alert("見本動画と自分の動画を両方読み込んでください。");
+return;
 }
-
+if(!ref.videoWidth||!my.videoWidth){
+alert("動画の読み込みが終わるまで待ってください。");
+return;
+}
+btn.disabled=true;
+try {
+const detector=await loadPoseDetector();
+const resultRef=detector.detectForVideo(ref,performance.now());
+const resultMy=detector.detectForVideo(my,performance.now());
+const lmRef=resultRef.landmarks?.[0];
+const lmMy=resultMy.landmarks?.[0];
+if(!lmRef||!lmMy){
+showError("骨格を検出できませんでした。全身が映るように撮影してください。");
+return;
+}
+drawSkeleton("ref",ref,lmRef);
+drawSkeleton("my",my,lmMy);
+const metricsRef=getMetrics(lmRef);
+const metricsMy=getMetrics(lmMy);
+const result=compareMetrics(metricsRef,metricsMy);
+currentResult={
+tech:currentTech.name,
+student:document.getElementById("studentName").value.trim(),
+date:new Date().toISOString(),
+good:result.good,
+improve:result.improve,
+advice:result.advice,
+landmarks:{ref:lmRef,my:lmMy}
+};
+renderReport(currentResult);
+showError("分析が完了しました。ほかの場面でも比較してみましょう。");
+} catch(e) {
+console.error(e);
+showError("姿勢推定を読み込めませんでした。インターネット接続を確認してください。動画の再生や比較は引き続き利用できます。");
+alert("姿勢分析機能の読み込みに失敗しました。基本機能はそのまま利用できます。");
+} finally {
+btn.disabled=false;
+}
+}
 function clearReport() {
-  currentResult=null;
-  document.getElementById("good").innerHTML='<p class="muted">分析後に表示されます。</p>';
-  document.getElementById("improve").innerHTML='<p class="muted">分析後に表示されます。</p>';
-  document.getElementById("advice").innerHTML='<p class="muted">分析後に表示されます。</p>';
-  document.getElementById("reportIntro").textContent="分析すると、良いところや改善のポイントが表示されます。";
+currentResult=null;
+document.getElementById("good").innerHTML='<p class="muted">分析後に表示されます。</p>';
+document.getElementById("improve").innerHTML='<p class="muted">分析後に表示されます。</p>';
+document.getElementById("advice").innerHTML='<p class="muted">分析後に表示されます。</p>';
+document.getElementById("reportIntro").textContent="分析すると、良いところや改善のポイントが表示されます。";
 }
-
 function renderReport(data) {
-  document.getElementById("good").innerHTML=
-    data.good.map(x=>"<p>✓ "+escapeHTML(x)+"</p>").join("");
-  document.getElementById("improve").innerHTML=
-    data.improve.map(x=>"<p>・"+escapeHTML(x)+"</p>").join("");
-  document.getElementById("advice").innerHTML=
-    data.advice.map((x,i)=>'<div class="advice">'+(i+1)+". "+escapeHTML(x)+"</div>").join("");
-  document.getElementById("reportIntro").textContent=
-    "現在の動画の姿勢をもとにした参考分析です。技の完成度を自動判定するものではありません。";
+document.getElementById("good").innerHTML=
+data.good.map(x=>"<p>✓ "+escapeHTML(x)+"</p>").join("");
+document.getElementById("improve").innerHTML=
+data.improve.map(x=>"<p>・"+escapeHTML(x)+"</p>").join("");
+document.getElementById("advice").innerHTML=
+data.advice.map((x,i)=>'<div class="advice">'+(i+1)+". "+escapeHTML(x)+"</div>").join("");
+document.getElementById("reportIntro").textContent=
+"現在の動画の姿勢をもとにした参考分析です。技の完成度を自動判定するものではありません。";
 }
-
-/* =========================================
-   学習記録
-   ========================================= */
-
 function saveAnalysis() {
-  if(!currentResult){alert("先に分析を実行してください。");return;}
-  const record={...currentResult};
-  delete record.landmarks;
-  history.push(record);
-  if(!safeWrite("mat_history",history)){
-    alert("保存容量が不足しています。");
-    return;
-  }
-  alert("学習記録を保存しました。");
+if(!currentResult){alert("先に分析を実行してください。");return;}
+const record={...currentResult};
+delete record.landmarks;
+history.push(record);
+if(!safeWrite("mat_history",history)){
+alert("保存容量が不足しています。");
+return;
 }
-
+alert("学習記録を保存しました。");
+}
 function showHistory() {
-  history=safeRead("mat_history",[]);
-  const name=document.getElementById("studentName").value.trim();
-  const list=document.getElementById("historyList");
-  list.innerHTML="";
-
-  const items=history.filter(x=>!name||x.student===name)
-    .sort((a,b)=>b.date.localeCompare(a.date));
-
-  if(!items.length){
-    list.innerHTML='<p class="muted">学習記録はまだありません。</p>';
-  }
-
-  items.forEach(item=>{
-    const div=document.createElement("div");
-    div.className="history-item";
-    const info=document.createElement("div");
-    info.innerHTML="<strong>"+escapeHTML(item.tech)+"</strong><br><span class='muted'>"+
-      escapeHTML(item.student||"名前未設定")+" · "+
-      new Date(item.date).toLocaleString("ja-JP")+"</span>";
-    const button=document.createElement("button");
-    button.className="btn secondary small";
-    button.textContent="見る";
-    button.onclick=()=>{
-      currentTech={name:item.tech,group:"保存した分析"};
-      currentResult=item;
-      document.getElementById("techTitle").textContent=item.tech+" の学習記録";
-      document.getElementById("techGroup").textContent="保存した分析";
-      renderReport(item);
-      showPage("analysis");
-    };
-    div.append(info,button);
-    list.appendChild(div);
-  });
-  showPage("history");
+history=safeRead("mat_history",[]);
+const name=document.getElementById("studentName").value.trim();
+const list=document.getElementById("historyList");
+list.innerHTML="";
+const items=history.filter(x=>!name||x.student===name).sort((a,b)=>b.date.localeCompare(a.date));
+if(!items.length){
+list.innerHTML='<p class="muted">学習記録はまだありません。</p>';
 }
-
-/* =========================================
-   画像出力
-   ========================================= */
-
+items.forEach(item=>{
+const div=document.createElement("div");
+div.className="history-item";
+const info=document.createElement("div");
+info.innerHTML="<strong>"+escapeHTML(item.tech)+"</strong><br><span class='muted'>"+
+escapeHTML(item.student||"名前未設定")+" · "+
+new Date(item.date).toLocaleString("ja-JP")+"</span>";
+const button=document.createElement("button");
+button.className="btn secondary small";
+button.textContent="見る";
+button.onclick=()=>{
+currentTech={name:item.tech,group:"保存した分析"};
+currentResult=item;
+document.getElementById("techTitle").textContent=item.tech+" の学習記録";
+document.getElementById("techGroup").textContent="保存した分析";
+renderReport(item);
+showPage("analysis");
+};
+div.append(info,button);
+list.appendChild(div);
+});
+showPage("history");
+}
 function saveImage() {
-  if(!currentResult){alert("先に分析してください。");return;}
-  const c=document.createElement("canvas");
-  c.width=1200;c.height=850;
-  const ctx=c.getContext("2d");
-  ctx.fillStyle="#f3f6fb";ctx.fillRect(0,0,1200,850);
-  ctx.fillStyle="#101d38";ctx.fillRect(0,0,1200,105);
-  ctx.fillStyle="white";ctx.font="bold 38px sans-serif";
-  ctx.fillText("MAT COACHING",45,68);
-  ctx.fillStyle="#202c40";ctx.font="bold 30px sans-serif";
-  ctx.fillText(currentResult.tech+" の分析結果",45,165);
-  ctx.font="19px sans-serif";
-  ctx.fillText("学習者："+(currentResult.student||"名前未設定"),45,205);
-  ctx.fillText(new Date(currentResult.date).toLocaleString("ja-JP"),45,240);
-
-  let y=310;
-  function section(title,items,color){
-    ctx.fillStyle=color;ctx.font="bold 24px sans-serif";
-    ctx.fillText(title,45,y);y+=42;
-    ctx.fillStyle="#202c40";ctx.font="18px sans-serif";
-    items.forEach(item=>{
-      const lines=wrapText(ctx,"・"+item,1050);
-      lines.forEach(line=>{
-        if(y>820)return;
-        ctx.fillText(line,55,y);y+=30;
-      });
-    });
-    y+=20;
-  }
-  section("良いところ",currentResult.good,"#168a65");
-  section("もっとよくするポイント",currentResult.improve,"#b36b37");
-  section("アドバイス",currentResult.advice,"#31588f");
-
-  c.toBlob(blob=>{
-    if(blob)downloadBlob(blob,"MAT-COACHING-分析結果.png");
-  });
+if(!currentResult){alert("先に分析してください。");return;}
+const c=document.createElement("canvas");
+c.width=1200;c.height=850;
+const ctx=c.getContext("2d");
+ctx.fillStyle="#f3f6fb";ctx.fillRect(0,0,1200,850);
+ctx.fillStyle="#101d38";ctx.fillRect(0,0,1200,105);
+ctx.fillStyle="white";ctx.font="bold 38px sans-serif";
+ctx.fillText("MAT COACHING",45,68);
+ctx.fillStyle="#202c40";ctx.font="bold 30px sans-serif";
+ctx.fillText(currentResult.tech+" の分析結果",45,165);
+ctx.font="19px sans-serif";
+ctx.fillText("学習者："+(currentResult.student||"名前未設定"),45,205);
+ctx.fillText(new Date(currentResult.date).toLocaleString("ja-JP"),45,240);
+let y=310;
+function section(title,items,color){
+ctx.fillStyle=color;ctx.font="bold 24px sans-serif";
+ctx.fillText(title,45,y);y+=42;
+ctx.fillStyle="#202c40";ctx.font="18px sans-serif";
+items.forEach(item=>{
+const lines=wrapText(ctx,"・"+item,1050);
+lines.forEach(line=>{
+if(y>820)return;
+ctx.fillText(line,55,y);y+=30;
+});
+});
+y+=20;
+}
+section("良いところ",currentResult.good,"#168a65");
+section("もっとよくするポイント",currentResult.improve,"#b36b37");
+section("アドバイス",currentResult.advice,"#31588f");
+c.toBlob(blob=>{
+if(blob)downloadBlob(blob,"MAT-COACHING-分析結果.png");
+});
 }
 function wrapText(ctx,text,maxWidth) {
-  const chars=[...text],lines=[];
-  let line="";
-  chars.forEach(ch=>{
-    if(ctx.measureText(line+ch).width>maxWidth&&line){
-      lines.push(line);line=ch;
-    }else line+=ch;
-  });
-  if(line)lines.push(line);
-  return lines;
+const chars=[...text],lines=[];
+let line="";
+chars.forEach(ch=>{
+if(ctx.measureText(line+ch).width>maxWidth&&line){
+lines.push(line);line=ch;
+}else line+=ch;
+});
+if(line)lines.push(line);
+return lines;
 }
-
-/* =========================================
-   起動
-   ========================================= */
-
 initialize();
 requestAnimationFrame(updateSeek);
-
 </script>
 </body>
 </html>
