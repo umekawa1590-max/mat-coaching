@@ -1,0 +1,1169 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101d38">
+<title>MAT COACHING</title>
+
+<!-- 外部ライブラリ -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<style>
+:root {
+  --navy:#101d38;
+  --navy2:#1b3157;
+  --blue:#3678e5;
+  --light:#f3f6fb;
+  --white:#fff;
+  --text:#202b3d;
+  --muted:#77849a;
+  --border:#e1e7f0;
+  --green:#1c9b73;
+  --red:#e45c68;
+  --shadow:0 8px 28px rgba(16,29,56,.08);
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:var(--light);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+}
+button,input,select,textarea {font:inherit}
+button {cursor:pointer}
+header {
+  background:var(--navy);
+  color:white;
+  padding:16px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  position:sticky;
+  top:0;
+  z-index:20;
+  box-shadow:0 3px 15px #101d3830;
+}
+.logo {font-size:21px;font-weight:800;letter-spacing:1.5px}
+.logo span {color:#75aaff}
+.header-right {display:flex;gap:8px;align-items:center}
+.header-btn {
+  border:1px solid #ffffff55;
+  color:white;
+  background:#ffffff12;
+  border-radius:9px;
+  padding:9px 13px;
+  font-size:13px;
+}
+main {max-width:1200px;margin:auto;padding:24px 20px 60px}
+.page {display:none}
+.page.active {display:block}
+.hero {
+  background:linear-gradient(120deg,#101d38,#294c80);
+  border-radius:18px;
+  padding:28px;
+  color:white;
+  margin-bottom:24px;
+}
+.hero h1 {font-size:27px;margin:0 0 8px}
+.hero p {color:#d4e0f4;margin:0;line-height:1.7}
+.section-title {
+  font-size:19px;
+  font-weight:800;
+  margin:25px 0 14px;
+}
+.muted {color:var(--muted);font-size:13px}
+.input {
+  width:100%;
+  padding:12px 13px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:white;
+  outline:none;
+}
+.input:focus {border-color:var(--blue)}
+.btn {
+  border:0;
+  background:var(--blue);
+  color:white;
+  padding:11px 17px;
+  border-radius:9px;
+  font-weight:700;
+}
+.btn:hover {filter:brightness(1.06)}
+.btn.secondary {background:#e8eef8;color:var(--navy)}
+.btn.dark {background:var(--navy)}
+.btn.danger {background:var(--red)}
+.btn.green {background:var(--green)}
+.btn.small {padding:7px 11px;font-size:12px}
+.btn:disabled {opacity:.45;cursor:not-allowed}
+.toolbar {display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.student-bar {
+  display:flex;gap:10px;align-items:center;
+  margin-bottom:20px;max-width:500px;
+}
+.student-bar input {flex:1}
+.tech-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(175px,1fr));
+  gap:13px;
+}
+.tech-card {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:17px;
+  text-align:left;
+  box-shadow:var(--shadow);
+  transition:.2s;
+  min-height:135px;
+}
+.tech-card:hover {transform:translateY(-3px);border-color:var(--blue)}
+.tech-icon {font-size:30px;margin-bottom:9px}
+.tech-name {font-weight:800;font-size:15px}
+.tech-group {font-size:11px;color:var(--muted);margin-top:5px}
+.panel {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px;
+  box-shadow:var(--shadow);
+  margin-bottom:17px;
+}
+.panel h3 {margin:0 0 13px;font-size:16px}
+.video-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+.video-box {
+  background:#101d38;
+  border-radius:12px;
+  overflow:hidden;
+  position:relative;
+  min-height:180px;
+}
+.video-box video {
+  width:100%;
+  max-height:390px;
+  display:block;
+  background:#080e19;
+}
+.video-box canvas {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+.video-label {
+  color:white;
+  font-size:13px;
+  font-weight:800;
+  padding:10px 12px;
+  background:#1b3157;
+}
+.video-empty {
+  color:#c5d3e8;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:180px;
+  text-align:center;
+  padding:20px;
+  font-size:13px;
+}
+.upload-area {display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.upload-area label {
+  display:inline-flex;align-items:center;
+  background:#e8eef8;color:var(--navy);
+  padding:9px 12px;border-radius:8px;
+  font-size:12px;font-weight:700;cursor:pointer;
+}
+.upload-area input {display:none}
+.play-controls {
+  display:flex;gap:9px;flex-wrap:wrap;
+  align-items:center;margin-top:14px;
+}
+.play-controls input[type=range] {flex:1;min-width:120px}
+.result-grid {
+  display:grid;grid-template-columns:1fr 1fr;gap:13px;
+}
+.result-card {
+  border-radius:12px;padding:16px;background:#f3f7fd;
+  border:1px solid #e3ebf7;
+}
+.result-card.good {background:#effaf6;border-color:#d7f0e6}
+.result-card.improve {background:#fff7f2;border-color:#f6e5d9}
+.result-card h4 {margin:0 0 9px}
+.result-card p {font-size:14px;line-height:1.8;margin:0}
+.advice-item {
+  padding:13px 0;border-bottom:1px solid var(--border);
+  font-size:14px;line-height:1.8;
+}
+.advice-item:last-child {border:0}
+.tag {
+  display:inline-block;background:#e8eef8;color:#294c80;
+  padding:4px 8px;border-radius:5px;font-size:11px;margin-right:5px;
+}
+.history-item {
+  padding:13px;border:1px solid var(--border);
+  border-radius:9px;margin:8px 0;
+  display:flex;justify-content:space-between;gap:10px;align-items:center;
+}
+.history-item strong {font-size:14px}
+.hidden {display:none!important}
+.notice {
+  background:#fff8e8;border:1px solid #f3e2b6;
+  padding:12px;border-radius:9px;color:#77591d;
+  font-size:12px;line-height:1.7;margin:12px 0;
+}
+.status {font-size:12px;color:var(--muted);margin-top:8px}
+footer {text-align:center;color:var(--muted);font-size:11px;padding:25px}
+.modal-bg {
+  position:fixed;inset:0;background:#081326aa;
+  z-index:50;display:none;align-items:center;justify-content:center;
+  padding:15px;
+}
+.modal-bg.show {display:flex}
+.modal {
+  background:white;width:min(620px,100%);
+  max-height:90vh;overflow:auto;border-radius:15px;padding:22px;
+}
+.modal h2 {margin-top:0}
+.form-row {margin:13px 0}
+.form-row label {display:block;font-size:12px;font-weight:700;margin-bottom:6px}
+@media(max-width:700px) {
+  main {padding:16px 12px 45px}
+  header {padding:13px}
+  .logo {font-size:17px}
+  .header-btn {font-size:11px;padding:8px}
+  .video-grid,.result-grid {grid-template-columns:1fr}
+  .hero {padding:21px}
+  .hero h1 {font-size:23px}
+}
+@media print {
+  header,.no-print,.upload-area,.play-controls,footer {display:none!important}
+  body {background:white}
+  main {max-width:none;padding:0}
+  .panel {box-shadow:none;break-inside:avoid}
+  .page {display:none!important}
+  #analysisPage {display:block!important}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">MAT <span>COACHING</span></div>
+  <div class="header-right">
+    <button class="header-btn" onclick="showPage('homePage')">ホーム</button>
+    <button class="header-btn" onclick="showHistory()">学習記録</button>
+    <button class="header-btn" onclick="openTeacherLogin()">先生用</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ホーム -->
+<section id="homePage" class="page active">
+  <div class="hero">
+    <h1>自分の動きを、もっとよく。</h1>
+    <p>見本動画と自分の動画を比べて、マット運動のポイントを確認しよう。</p>
+  </div>
+
+  <div class="student-bar">
+    <input id="studentName" class="input" placeholder="自分の名前を入力">
+    <button class="btn" onclick="saveStudent()">設定</button>
+  </div>
+  <div class="muted" id="studentMessage">名前を入力して学習を始めましょう。</div>
+
+  <div class="section-title">技を選ぼう</div>
+  <div id="techGrid" class="tech-grid"></div>
+</section>
+
+<!-- 分析 -->
+<section id="analysisPage" class="page">
+  <div class="toolbar no-print" style="margin-bottom:15px">
+    <button class="btn secondary" onclick="showPage('homePage')">← 技の選択に戻る</button>
+    <span class="tag" id="selectedGroup"></span>
+  </div>
+
+  <div class="section-title" id="selectedTechTitle">技の分析</div>
+  <p class="muted">見本動画と自分の動画を読み込んで、動きを比べてみましょう。</p>
+
+  <div class="video-grid">
+    <div>
+      <div class="video-label" style="background:#294c80;color:white;padding:10px;border-radius:9px 9px 0 0">見本動画</div>
+      <div class="video-box" style="border-radius:0 0 10px 10px">
+        <video id="referenceVideo" playsinline controls></video>
+        <canvas id="referenceCanvas"></canvas>
+        <div id="referenceEmpty" class="video-empty">先生が登録した見本動画を選択してください。</div>
+      </div>
+      <div class="upload-area no-print">
+        <label>端末から選択<input type="file" accept="video/*" onchange="loadVideo(event,'reference')"></label>
+        <button class="btn secondary small" onclick="chooseSavedReference()">登録済み見本</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="video-label" style="background:#1c9b73;color:white;padding:10px;border-radius:9px 9px 0 0">自分の動画</div>
+      <div class="video-box" style="border-radius:0 0 10px 10px">
+        <video id="studentVideo" playsinline controls></video>
+        <canvas id="studentCanvas"></canvas>
+        <div id="studentEmpty" class="video-empty">撮影するか、動画を選択してください。</div>
+      </div>
+      <div class="upload-area no-print">
+        <label>端末から選択<input type="file" accept="video/*" onchange="loadVideo(event,'student')"></label>
+        <button class="btn green small" onclick="openCamera()">カメラで撮影</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel no-print">
+    <h3>動画の再生・比較</h3>
+    <div class="play-controls">
+      <button class="btn" onclick="playBoth()">▶ 同時再生</button>
+      <button class="btn secondary" onclick="pauseBoth()">一時停止</button>
+      <button class="btn secondary" onclick="stepBoth(-1)">◀ 1秒戻る</button>
+      <button class="btn secondary" onclick="stepBoth(1)">1秒進む ▶</button>
+      <button class="btn secondary" onclick="setSlow()">0.5倍速</button>
+      <button class="btn secondary" onclick="setNormal()">通常速度</button>
+    </div>
+    <div class="play-controls">
+      <span class="muted">再生位置</span>
+      <input id="syncRange" type="range" min="0" max="1000" value="0" oninput="seekBoth(this.value)">
+    </div>
+    <div class="notice">動画の長さや撮影開始位置が異なる場合、再生位置を調整してください。完全な動作同期ではありません。</div>
+  </div>
+
+  <div class="panel no-print">
+    <h3>骨格表示・姿勢分析</h3>
+    <div class="toolbar">
+      <button class="btn" id="poseButton" onclick="runPoseAnalysis()">骨格を検出して分析する</button>
+      <button class="btn secondary" onclick="toggleSkeleton()">骨格表示 ON / OFF</button>
+    </div>
+    <div class="status" id="poseStatus">動画を2つ読み込んでから分析してください。</div>
+    <div class="status">骨格推定は動画の現在位置の画像を対象に行います。動作全体の自動採点ではありません。</div>
+  </div>
+
+  <div class="panel" id="resultPanel">
+    <h3>分析結果</h3>
+    <p class="muted" id="analysisIntro">分析を実行すると、姿勢の特徴と練習のポイントが表示されます。</p>
+    <div class="result-grid">
+      <div class="result-card good">
+        <h4>◎ 良いところ</h4>
+        <div id="goodPoints"><p>分析後に表示されます。</p></div>
+      </div>
+      <div class="result-card improve">
+        <h4>△ もっとよくするポイント</h4>
+        <div id="improvePoints"><p>分析後に表示されます。</p></div>
+      </div>
+    </div>
+    <div class="section-title">具体的なアドバイス</div>
+    <div id="adviceList">
+      <div class="advice-item">動画を読み込み、骨格を検出して分析してみましょう。</div>
+    </div>
+    <div class="toolbar no-print" style="margin-top:18px">
+      <button class="btn green" onclick="saveAnalysis()">学習記録に保存</button>
+      <button class="btn secondary" onclick="exportReport()">PDF・印刷</button>
+      <button class="btn secondary" onclick="exportImage()">結果を画像で保存</button>
+    </div>
+  </div>
+</section>
+
+<!-- 学習記録 -->
+<section id="historyPage" class="page">
+  <div class="toolbar">
+    <button class="btn secondary" onclick="showPage('homePage')">← ホーム</button>
+  </div>
+  <div class="section-title">学習記録</div>
+  <p class="muted">この端末に保存した分析結果を確認できます。</p>
+  <div id="historyList"></div>
+</section>
+
+<!-- 先生用 -->
+<section id="teacherPage" class="page">
+  <div class="toolbar">
+    <button class="btn secondary" onclick="showPage('homePage')">← ホーム</button>
+  </div>
+  <div class="section-title">先生用 見本動画管理</div>
+  <div class="notice">この管理画面の暗証番号は、この端末内だけの簡易ロックです。機密情報を守るための強固な認証ではありません。</div>
+
+  <div class="panel">
+    <h3>見本動画を登録する</h3>
+    <div class="form-row">
+      <label>技の種類</label>
+      <select id="teacherTech" class="input"></select>
+    </div>
+    <div class="form-row">
+      <label>見本動画の名前</label>
+      <input id="referenceName" class="input" placeholder="例：前転の基本">
+    </div>
+    <div class="form-row">
+      <label>動画ファイル</label>
+      <input id="referenceFile" type="file" class="input" accept="video/*">
+    </div>
+    <button class="btn" onclick="addReference()">見本動画を登録</button>
+  </div>
+
+  <div class="panel">
+    <h3>登録済みの見本動画</h3>
+    <div id="referenceList"></div>
+  </div>
+
+  <div class="panel">
+    <h3>見本動画セットの配布</h3>
+    <p class="muted">登録した見本動画をZIP形式で書き出し、生徒の端末で読み込めます。</p>
+    <div class="toolbar">
+      <button class="btn" onclick="exportReferenceSet()">見本動画セットを書き出す</button>
+      <label class="btn secondary">ZIPを読み込む<input type="file" accept=".zip" style="display:none" onchange="importReferenceSet(event)"></label>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>技の追加</h3>
+    <div class="form-row">
+      <label>技の名前</label>
+      <input id="newTechName" class="input" placeholder="追加する技の名前">
+    </div>
+    <div class="form-row">
+      <label>分類</label>
+      <select id="newTechGroup" class="input">
+        <option>回転系：接転技群</option>
+        <option>回転系：ほん転技群</option>
+        <option>巧技系：平均立ち技群</option>
+        <option>巧技系：倒立</option>
+        <option>先生が追加した技</option>
+      </select>
+    </div>
+    <button class="btn" onclick="addTech()">技を追加する</button>
+  </div>
+
+  <div class="panel">
+    <h3>先生用暗証番号の変更</h3>
+    <input id="newPin" class="input" type="password" placeholder="新しい暗証番号">
+    <button class="btn secondary" style="margin-top:10px" onclick="changePin()">変更する</button>
+  </div>
+</section>
+
+</main>
+
+<footer>MAT COACHING · マット運動 学習サポート</footer>
+
+<!-- カメラモーダル -->
+<div id="cameraModal" class="modal-bg">
+  <div class="modal">
+    <h2>カメラ撮影</h2>
+    <video id="cameraPreview" autoplay playsinline muted style="width:100%;background:#111;border-radius:10px"></video>
+    <div class="form-row">
+      <label>カメラ</label>
+      <select id="cameraSelect" class="input" onchange="switchCamera()">
+        <option value="environment">背面カメラ</option>
+        <option value="user">前面カメラ</option>
+      </select>
+    </div>
+    <div class="toolbar">
+      <button class="btn green" id="recordButton" onclick="startRecording()">● 撮影開始</button>
+      <button class="btn danger" onclick="stopRecording()">撮影終了</button>
+      <button class="btn secondary" onclick="closeCamera()">閉じる</button>
+    </div>
+    <p class="muted" id="cameraStatus"></p>
+  </div>
+</div>
+
+<!-- 見本選択モーダル -->
+<div id="referenceModal" class="modal-bg">
+  <div class="modal">
+    <h2>登録済みの見本動画</h2>
+    <div id="referenceChoices"></div>
+    <button class="btn secondary" onclick="closeReferenceModal()">閉じる</button>
+  </div>
+</div>
+
+<script type="module">
+import { PoseLandmarker, FilesetResolver } from
+"https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+
+const $ = id => document.getElementById(id);
+
+const DB_NAME = "MAT_COACHING_DB";
+const DB_VERSION = 1;
+let db;
+let poseLandmarker = null;
+let poseReady = false;
+let skeletonVisible = true;
+let currentTech = null;
+let currentAnalysis = null;
+let cameraStream = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+let activeCamera = "environment";
+let cameraTarget = "student";
+
+const defaultTechs = [
+ ["前転","回転系：接転技群","🔄"],
+ ["開脚前転","回転系：接転技群","🤸"],
+ ["倒立前転","回転系：接転技群","🙃"],
+ ["伸膝前転","回転系：接転技群","🤸"],
+ ["跳び前転","回転系：接転技群","🏃"],
+ ["後転","回転系：接転技群","🔁"],
+ ["開脚後転","回転系：接転技群","🤸"],
+ ["伸膝後転","回転系：接転技群","🤸"],
+ ["後転倒立","回転系：接転技群","🙃"],
+ ["側方倒立回転","回転系：ほん転技群","↗️"],
+ ["倒立ブリッジ","回転系：ほん転技群","🌉"],
+ ["側方倒立回転跳び1/4ひねり（ロンダート）","回転系：ほん転技群","↪️"],
+ ["前方倒立回転","回転系：ほん転技群","🤸"],
+ ["前方倒立回転跳び","回転系：ほん転技群","🤸"],
+ ["頭はねおき","回転系：ほん転技群","⬆️"],
+ ["片足平均立ち","巧技系：平均立ち技群","🧍"],
+ ["片足正面水平立ち","巧技系：平均立ち技群","🧍"],
+ ["片足側面水平立ち","巧技系：平均立ち技群","🧍"],
+ ["Y字バランス","巧技系：平均立ち技群","🩰"],
+ ["倒立","巧技系：倒立","🙃"],
+ ["倒立ひねり","巧技系：倒立","🔄"],
+ ["頭倒立","巧技系：倒立","🙃"],
+ ["補助倒立","巧技系：倒立","🤸"],
+ ["補助倒立前転","その他・系統性を踏まえた技","🤸"]
+];
+
+function openDB() {
+ return new Promise((resolve,reject)=>{
+  const request=indexedDB.open(DB_NAME,DB_VERSION);
+  request.onupgradeneeded=()=>{
+   const d=request.result;
+   if(!d.objectStoreNames.contains("refs"))
+    d.createObjectStore("refs",{keyPath:"id",autoIncrement:true});
+   if(!d.objectStoreNames.contains("history"))
+    d.createObjectStore("history",{keyPath:"id",autoIncrement:true});
+   if(!d.objectStoreNames.contains("settings"))
+    d.createObjectStore("settings",{keyPath:"key"});
+   if(!d.objectStoreNames.contains("techs"))
+    d.createObjectStore("techs",{keyPath:"name"});
+  };
+  request.onsuccess=()=>{db=request.result;resolve(db)};
+  request.onerror=()=>reject(request.error);
+ });
+}
+function store(name,mode="readonly") {
+ return db.transaction(name,mode).objectStore(name);
+}
+function getAll(name) {
+ return new Promise((resolve,reject)=>{
+  const r=store(name).getAll();
+  r.onsuccess=()=>resolve(r.result);
+  r.onerror=()=>reject(r.error);
+ });
+}
+function put(name,value) {
+ return new Promise((resolve,reject)=>{
+  const r=store(name,"readwrite").put(value);
+  r.onsuccess=()=>resolve(r.result);
+  r.onerror=()=>reject(r.error);
+ });
+}
+function add(name,value) {
+ return new Promise((resolve,reject)=>{
+  const r=store(name,"readwrite").add(value);
+  r.onsuccess=()=>resolve(r.result);
+  r.onerror=()=>reject(r.error);
+ });
+}
+function remove(name,id) {
+ return new Promise((resolve,reject)=>{
+  const r=store(name,"readwrite").delete(id);
+  r.onsuccess=()=>resolve();
+  r.onerror=()=>reject(r.error);
+ });
+}
+function getSetting(key) {
+ return new Promise(resolve=>{
+  const r=store("settings").get(key);
+  r.onsuccess=()=>resolve(r.result?.value);
+  r.onerror=()=>resolve(null);
+ });
+}
+
+async function init() {
+ await openDB();
+ for(const t of defaultTechs) {
+  if(!(await new Promise(resolve=>{
+   const r=store("techs").get(t[0]);
+   r.onsuccess=()=>resolve(r.result);
+   r.onerror=()=>resolve(null);
+  }))) {
+   await put("techs",{name:t[0],group:t[1],icon:t[2],custom:false});
+  }
+ }
+ if(!await getSetting("pin")) await put("settings",{key:"pin",value:"1234"});
+ if(!await getSetting("student")) await put("settings",{key:"student",value:""});
+ $("studentName").value=await getSetting("student")||"";
+ await renderTechs();
+ await renderTeacherTechs();
+ $("studentMessage").textContent=$("studentName").value
+  ? "学習者："+$("studentName").value : "名前を入力して学習を始めましょう。";
+}
+await init();
+
+window.showPage = id => {
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ $(id).classList.add("active");
+ window.scrollTo(0,0);
+};
+window.saveStudent = async () => {
+ const name=$("studentName").value.trim();
+ await put("settings",{key:"student",value:name});
+ $("studentMessage").textContent=name ? "学習者："+name : "名前を入力してください。";
+};
+
+async function renderTechs() {
+ const techs=await getAll("techs");
+ $("techGrid").innerHTML="";
+ techs.sort((a,b)=>a.name.localeCompare(b.name,"ja"));
+ for(const t of techs) {
+  const b=document.createElement("button");
+  b.className="tech-card";
+  b.innerHTML=`<div class="tech-icon">${escapeHTML(t.icon||"🤸")}</div>
+   <div class="tech-name">${escapeHTML(t.name)}</div>
+   <div class="tech-group">${escapeHTML(t.group)}</div>`;
+  b.onclick=()=>selectTech(t);
+  $("techGrid").appendChild(b);
+ }
+}
+function escapeHTML(s) {
+ return String(s??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+async function renderTeacherTechs() {
+ const techs=await getAll("techs");
+ $("teacherTech").innerHTML=techs.map(t=>
+  `<option value="${escapeHTML(t.name)}">${escapeHTML(t.name)}</option>`
+ ).join("");
+}
+async function selectTech(t) {
+ currentTech=t;
+ $("selectedTechTitle").textContent=t.name+" の動きを比べよう";
+ $("selectedGroup").textContent=t.group;
+ clearResults();
+ showPage("analysisPage");
+ await renderReferences();
+}
+window.selectTech=selectTech;
+
+function clearResults() {
+ currentAnalysis=null;
+ $("goodPoints").innerHTML="<p>分析後に表示されます。</p>";
+ $("improvePoints").innerHTML="<p>分析後に表示されます。</p>";
+ $("adviceList").innerHTML='<div class="advice-item">動画を読み込み、骨格を検出して分析してみましょう。</div>';
+ $("analysisIntro").textContent="分析を実行すると、姿勢の特徴と練習のポイントが表示されます。";
+}
+
+let referenceURL=null,studentURL=null;
+window.loadVideo=(event,which)=>{
+ const file=event.target.files?.[0];
+ if(!file)return;
+ if(!file.type.startsWith("video/")) {
+  alert("動画ファイルを選択してください。");return;
+ }
+ const url=URL.createObjectURL(file);
+ setVideo(which,url);
+};
+function setVideo(which,url) {
+ const video=$(which==="reference"?"referenceVideo":"studentVideo");
+ const empty=$(which==="reference"?"referenceEmpty":"studentEmpty");
+ if(which==="reference") {
+  if(referenceURL)URL.revokeObjectURL(referenceURL);
+  referenceURL=url;
+ } else {
+  if(studentURL)URL.revokeObjectURL(studentURL);
+  studentURL=url;
+ }
+ video.src=url;
+ video.load();
+ empty.classList.add("hidden");
+ video.onloadedmetadata=()=>drawCurrentPose(which);
+}
+window.setVideo=setVideo;
+
+window.playBoth=()=>{
+ const a=$("referenceVideo"),b=$("studentVideo");
+ if(!a.src||!b.src){alert("見本動画と自分の動画を読み込んでください。");return;}
+ const target=Math.min(a.currentTime,b.currentTime);
+ a.currentTime=target;b.currentTime=target;
+ a.play();b.play();
+};
+window.pauseBoth=()=>{$("referenceVideo").pause();$("studentVideo").pause()};
+window.stepBoth=delta=>{
+ for(const v of [$("referenceVideo"),$("studentVideo")])
+  if(v.src)v.currentTime=Math.max(0,Math.min(v.duration||0,v.currentTime+delta));
+};
+window.setSlow=()=>{ $("referenceVideo").playbackRate=.5;$("studentVideo").playbackRate=.5; };
+window.setNormal=()=>{ $("referenceVideo").playbackRate=1;$("studentVideo").playbackRate=1; };
+window.seekBoth=value=>{
+ for(const v of [$("referenceVideo"),$("studentVideo")])
+  if(v.duration)v.currentTime=(value/1000)*v.duration;
+};
+function syncRange() {
+ const v=$("studentVideo");
+ if(v.duration)$("syncRange").value=Math.round(v.currentTime/v.duration*1000);
+ requestAnimationFrame(syncRange);
+}
+requestAnimationFrame(syncRange);
+
+async function initializePose() {
+ if(poseReady)return true;
+ $("poseStatus").textContent="姿勢推定モデルを読み込んでいます…";
+ try {
+  const vision=await FilesetResolver.forVisionTasks(
+   "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+  );
+  poseLandmarker=await PoseLandmarker.createFromOptions(vision,{
+   baseOptions:{
+    modelAssetPath:"https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+    delegate:"GPU"
+   },
+   runningMode:"VIDEO",
+   numPoses:1
+  });
+  poseReady=true;
+  return true;
+ } catch(e) {
+  console.error(e);
+  try {
+   const vision=await FilesetResolver.forVisionTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+   );
+   poseLandmarker=await PoseLandmarker.createFromOptions(vision,{
+    baseOptions:{
+     modelAssetPath:"https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task"
+    },
+    runningMode:"VIDEO",
+    numPoses:1
+   });
+   poseReady=true;return true;
+  } catch(err) {
+   $("poseStatus").textContent="姿勢推定モデルを読み込めませんでした。インターネット接続を確認してください。";
+   return false;
+  }
+ }
+}
+const connections=[
+ [11,12],[11,13],[13,15],[12,14],[14,16],
+ [11,23],[12,24],[23,24],[23,25],[25,27],
+ [24,26],[26,28],[27,29],[29,31],[28,30],[30,32],
+ [15,17],[15,19],[15,21],[16,18],[16,20],[16,22]
+];
+function drawSkeleton(canvas,video,landmarks) {
+ const ctx=canvas.getContext("2d");
+ const w=video.videoWidth,h=video.videoHeight;
+ if(!w||!h)return;
+ canvas.width=w;canvas.height=h;
+ ctx.clearRect(0,0,w,h);
+ if(!skeletonVisible||!landmarks)return;
+ ctx.lineWidth=Math.max(3,w/250);
+ ctx.strokeStyle="#32e6b0";
+ ctx.fillStyle="#ffcf56";
+ for(const [a,b] of connections) {
+  const p=landmarks[a],q=landmarks[b];
+  if(!p||!q||p.visibility<.35||q.visibility<.35)continue;
+  ctx.beginPath();ctx.moveTo(p.x*w,p.y*h);ctx.lineTo(q.x*w,q.y*h);ctx.stroke();
+ }
+ for(const p of landmarks) {
+  if(p.visibility<.35)continue;
+  ctx.beginPath();ctx.arc(p.x*w,p.y*h,Math.max(3,w/160),0,Math.PI*2);ctx.fill();
+ }
+}
+function drawCurrentPose(which) {
+ const v=$(which==="reference"?"referenceVideo":"studentVideo");
+ if(!poseReady||!v.videoWidth)return;
+ try {
+  const result=poseLandmarker.detectForVideo(v,performance.now());
+  const lm=result.landmarks?.[0];
+  drawSkeleton($(which==="reference"?"referenceCanvas":"studentCanvas"),v,lm);
+ } catch(e) {console.warn(e)}
+}
+window.toggleSkeleton=()=>{
+ skeletonVisible=!skeletonVisible;
+ if(!skeletonVisible) {
+  for(const id of ["referenceCanvas","studentCanvas"])
+   $(id).getContext("2d").clearRect(0,0,$(id).width,$(id).height);
+ } else {
+  drawCurrentPose("reference");drawCurrentPose("student");
+ }
+};
+for(const which of ["reference","student"]) {
+ const v=$(which==="reference"?"referenceVideo":"studentVideo");
+ v.addEventListener("seeked",()=>drawCurrentPose(which));
+ v.addEventListener("timeupdate",()=>{
+  if(poseReady && !v.paused)drawCurrentPose(which);
+ });
+}
+
+function angle(a,b,c) {
+ const ab=[a.x-b.x,a.y-b.y],cb=[c.x-b.x,c.y-b.y];
+ const dot=ab[0]*cb[0]+ab[1]*cb[1];
+ const mag=Math.hypot(...ab)*Math.hypot(...cb);
+ if(!mag)return null;
+ return Math.acos(Math.max(-1,Math.min(1,dot/mag)))*180/Math.PI;
+}
+function point(lm,i) {return lm?.[i]||null}
+function midpoint(a,b) {
+ if(!a||!b)return null;
+ return {x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+}
+function poseMetrics(lm) {
+ const leftShoulder=point(lm,11),rightShoulder=point(lm,12);
+ const leftHip=point(lm,23),rightHip=point(lm,24);
+ const leftKnee=point(lm,25),rightKnee=point(lm,26);
+ const leftAnkle=point(lm,27),rightAnkle=point(lm,28);
+ const shoulder=midpoint(leftShoulder,rightShoulder);
+ const hip=midpoint(leftHip,rightHip);
+ const knee=midpoint(leftKnee,rightKnee);
+ const ankle=midpoint(leftAnkle,rightAnkle);
+ const visibility=lm.filter(p=>p.visibility>.5).length/lm.length;
+ return {
+  shoulder,hip,knee,ankle,visibility,
+  trunkAngle:shoulder&&hip&&ankle?angle(shoulder,hip,ankle):null,
+  kneeAngle:leftHip&&leftKnee&&leftAnkle?angle(leftHip,leftKnee,leftAnkle):null,
+  leftKneeAngle:leftHip&&leftKnee&&leftAnkle?angle(leftHip,leftKnee,leftAnkle):null,
+  rightKneeAngle:rightHip&&rightKnee&&rightAnkle?angle(rightHip,rightKnee,rightAnkle):null,
+  shoulderTilt:leftShoulder&&rightShoulder?
+   Math.abs(Math.atan2(leftShoulder.y-rightShoulder.y,leftShoulder.x-rightShoulder.x)*180/Math.PI):null,
+  hipHeight:hip?.y,
+  shoulderHeight:shoulder?.y
+ };
+}
+function difference(a,b) {
+ if(a==null||b==null)return null;
+ return Math.abs(a-b);
+}
+function makeAdvice(ref,stu,tech) {
+ const good=[],improve=[],advice=[];
+ if(stu.visibility<.55||ref.visibility<.55) {
+  return {
+   good:["動画から体の一部を確認できました。"],
+   improve:["体の一部が見えにくく、姿勢を十分に比べられませんでした。"],
+   advice:["全身が画面に入るように撮影しましょう。","カメラをできるだけ固定し、体の前や横から撮影すると比べやすくなります。"]
+  };
+ }
+ const trunkDiff=difference(ref.trunkAngle,stu.trunkAngle);
+ const kneeDiff=difference(ref.kneeAngle,stu.kneeAngle);
+ if(trunkDiff!==null) {
+  if(trunkDiff<15)good.push("体の中心部分の傾きが、見本に近い姿勢になっています。");
+  else improve.push("体の中心部分の傾きに、見本との違いが見られます。");
+ }
+ if(kneeDiff!==null) {
+  if(kneeDiff<15)good.push("ひざの曲がり方が、見本に近い状態です。");
+  else improve.push("ひざの曲がり方に違いが見られます。");
+ }
+ if(stu.shoulderTilt!==null) {
+  if(stu.shoulderTilt<12)good.push("肩のラインが大きく傾かずに保たれています。");
+  else improve.push("肩のラインが傾いているようです。");
+ }
+ if(!good.length)good.push("動画を撮影して、見本と比べようとしていることがよいところです。");
+ if(!improve.length)improve.push("今回確認できた姿勢では、大きな違いは見つかりませんでした。別の場面も比べてみましょう。");
+
+ const tips={
+  "前転":["手をしっかりマットにつき、あごを引いて背中を丸めましょう。","後頭部から背中へ、順番にマットにつけることを意識しましょう。"],
+  "開脚前転":["前転の途中から両足を開くタイミングを意識しましょう。","最後は両手でマットを押して、立ち上がりましょう。"],
+  "後転":["おへそを見て背中を丸めましょう。","両手を耳の横に準備して、手のひらでマットを押しましょう。"],
+  "開脚後転":["後ろに回るときに、両手を耳の横につきましょう。","足を左右に開き、手でマットを押して起き上がりましょう。"],
+  "側方倒立回転":["手をつく位置と足を振り上げる方向を確認しましょう。","両手と両足が順番にマットにつくことを意識しましょう。"],
+  "倒立":["手の真上に肩がくるように意識しましょう。","おなかに力を入れ、体をまっすぐに保ちましょう。"],
+  "Y字バランス":["軸足で床を押し、上半身を安定させましょう。","上げた足と両手の位置をゆっくり調整しましょう。"]
+ };
+ const selected=tips[tech.name]||[
+  "技のポイントを一つずつ確認しながら練習しましょう。",
+  "見本と自分の動画を同じタイミングで止めて、手足の位置を比べてみましょう。"
+ ];
+ advice.push(...selected);
+ advice.push("一度に全部を直そうとせず、まずは一つのポイントを意識してもう一度撮影してみましょう。");
+ return {good,improve,advice};
+}
+
+window.runPoseAnalysis=async()=>{
+ const a=$("referenceVideo"),b=$("studentVideo");
+ if(!a.src||!b.src){alert("見本動画と自分の動画を両方読み込んでください。");return;}
+ $("poseButton").disabled=true;
+ try {
+  if(!await initializePose())return;
+  const refResult=poseLandmarker.detectForVideo(a,performance.now());
+  const stuResult=poseLandmarker.detectForVideo(b,performance.now());
+  const ref=refResult.landmarks?.[0],stu=stuResult.landmarks?.[0];
+  if(!ref||!stu) {
+   $("poseStatus").textContent="骨格を検出できませんでした。全身が映るように撮影し直してください。";
+   return;
+  }
+  drawSkeleton($("referenceCanvas"),a,ref);
+  drawSkeleton($("studentCanvas"),b,stu);
+  const metricsRef=poseMetrics(ref),metricsStu=poseMetrics(stu);
+  const result=makeAdvice(metricsRef,metricsStu,currentTech);
+  currentAnalysis={
+   tech:currentTech.name,
+   student:$("studentName").value.trim(),
+   date:new Date().toISOString(),
+   good:result.good,improve:result.improve,advice:result.advice,
+   metrics:{
+    trunkDifference:difference(metricsRef.trunkAngle,metricsStu.trunkAngle),
+    kneeDifference:difference(metricsRef.kneeAngle,metricsStu.kneeAngle)
+   }
+  };
+  $("goodPoints").innerHTML=result.good.map(x=>`<p>✓ ${escapeHTML(x)}</p>`).join("");
+  $("improvePoints").innerHTML=result.improve.map(x=>`<p>・${escapeHTML(x)}</p>`).join("");
+  $("adviceList").innerHTML=result.advice.map((x,i)=>
+   `<div class="advice-item"><span class="tag">${i+1}</span>${escapeHTML(x)}</div>`
+  ).join("");
+  $("analysisIntro").textContent="現在の動画の姿勢をもとにした参考分析です。技の完成度を自動判定するものではありません。";
+  $("poseStatus").textContent="分析が完了しました。動画の別の場面でも確認してみましょう。";
+ } catch(e) {
+  console.error(e);
+  $("poseStatus").textContent="分析中にエラーが発生しました。動画を再読み込みしてください。";
+ } finally {
+  $("poseButton").disabled=false;
+ }
+};
+
+window.saveAnalysis=async()=>{
+ if(!currentAnalysis){alert("先に分析を実行してください。");return;}
+ const item={...currentAnalysis,student:$("studentName").value.trim()};
+ await add("history",item);
+ alert("学習記録を端末に保存しました。");
+};
+
+window.showHistory=async()=>{
+ const name=$("studentName").value.trim();
+ const all=await getAll("history");
+ const list=all.filter(x=>!name||x.student===name).sort((a,b)=>b.date.localeCompare(a.date));
+ $("historyList").innerHTML=list.length?"":"<p class='muted'>学習記録はまだありません。</p>";
+ for(const item of list) {
+  const div=document.createElement("div");
+  div.className="history-item";
+  const date=new Date(item.date).toLocaleString("ja-JP");
+  div.innerHTML=`<div><strong>${escapeHTML(item.tech)}</strong><br><span class="muted">${escapeHTML(item.student||"名前未設定")} · ${date}</span></div>`;
+  const btn=document.createElement("button");
+  btn.className="btn secondary small";btn.textContent="見る";
+  btn.onclick=()=>{
+   currentTech={name:item.tech,group:"保存した分析"};
+   currentAnalysis=item;
+   $("selectedTechTitle").textContent=item.tech+" の学習記録";
+   $("selectedGroup").textContent="保存した分析";
+   $("goodPoints").innerHTML=(item.good||[]).map(x=>`<p>✓ ${escapeHTML(x)}</p>`).join("");
+   $("improvePoints").innerHTML=(item.improve||[]).map(x=>`<p>・${escapeHTML(x)}</p>`).join("");
+   $("adviceList").innerHTML=(item.advice||[]).map((x,i)=>`<div class="advice-item">${i+1}. ${escapeHTML(x)}</div>`).join("");
+   $("analysisIntro").textContent="保存日時："+date;
+   showPage("analysisPage");
+  };
+  div.appendChild(btn);$("historyList").appendChild(div);
+ }
+ showPage("historyPage");
+};
+window.showHistory=window.showHistory;
+
+window.exportReport=()=>{
+ if(!currentAnalysis){alert("分析結果がありません。");return;}
+ window.print();
+};
+
+window.exportImage=()=>{
+ if(!currentAnalysis){alert("分析結果がありません。");return;}
+ const canvas=document.createElement("canvas");
+ canvas.width=1200;canvas.height=900;
+ const c=canvas.getContext("2d");
+ c.fillStyle="#f3f6fb";c.fillRect(0,0,1200,900);
+ c.fillStyle="#101d38";c.fillRect(0,0,1200,110);
+ c.fillStyle="#fff";c.font="bold 38px sans-serif";c.fillText("MAT COACHING",55,68);
+ c.fillStyle="#202b3d";c.font="bold 32px sans-serif";c.fillText(currentAnalysis.tech+" の分析結果",55,175);
+ c.font="20px sans-serif";c.fillText("学習者："+(currentAnalysis.student||"名前未設定"),55,220);
+ c.fillText("日付："+new Date(currentAnalysis.date).toLocaleString("ja-JP"),55,260);
+ c.fillStyle="#1c9b73";c.font="bold 25px sans-serif";c.fillText("良いところ",55,330);
+ c.fillStyle="#202b3d";c.font="20px sans-serif";
+ let y=375;
+ for(const x of currentAnalysis.good||[]){c.fillText("✓ "+x.slice(0,48),65,y);y+=40;}
+ y+=30;c.fillStyle="#c46a35";c.font="bold 25px sans-serif";c.fillText("もっとよくするポイント",55,y);y+=45;
+ c.fillStyle="#202b3d";c.font="20px sans-serif";
+ for(const x of currentAnalysis.improve||[]){c.fillText("・"+x.slice(0,48),65,y);y+=40;}
+ y+=30;c.fillStyle="#294c80";c.font="bold 25px sans-serif";c.fillText("アドバイス",55,y);y+=45;
+ c.fillStyle="#202b3d";c.font="19px sans-serif";
+ for(const x of currentAnalysis.advice||[]){c.fillText("・"+x.slice(0,50),65,y);y+=38;if(y>850)break;}
+ const a=document.createElement("a");
+ a.download="MAT-COACHING-分析結果.png";
+ a.href=canvas.toDataURL("image/png");a.click();
+};
+
+window.openCamera=async()=>{
+ try {
+  cameraTarget="student";
+  cameraStream=await navigator.mediaDevices.getUserMedia({
+   video:{facingMode:activeCamera},audio:true
+  });
+  $("cameraPreview").srcObject=cameraStream;
+  $("cameraModal").classList.add("show");
+  $("cameraStatus").textContent="撮影できます。周囲の安全を確認してから撮影してください。";
+ } catch(e) {
+  alert("カメラを利用できません。HTTPSまたはlocalhostで開いているか、カメラの使用を許可しているか確認してください。");
+ }
+};
+window.switchCamera=async()=>{
+ activeCamera=$("cameraSelect").value;
+ if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());
+ try {
+  cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:activeCamera},audio:true});
+  $("cameraPreview").srcObject=cameraStream;
+ } catch(e){alert("カメラを切り替えられませんでした。")}
+};
+window.startRecording=()=>{
+ if(!cameraStream){alert("カメラを起動してください。");return;}
+ recordedChunks=[];
+ const mime=MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+  ?"video/webm;codecs=vp9":"video/webm";
+ mediaRecorder=new MediaRecorder(cameraStream,{mimeType:mime});
+ mediaRecorder.ondataavailable=e=>{if(e.data.size)recordedChunks.push(e.data)};
+ mediaRecorder.onstop=()=>{
+  const blob=new Blob(recordedChunks,{type:"video/webm"});
+  const url=URL.createObjectURL(blob);
+  setVideo("student",url);
+  $("cameraStatus").textContent="撮影した動画を読み込みました。";
+ };
+ mediaRecorder.start();
+ $("recordButton").disabled=true;
+ $("cameraStatus").textContent="撮影中です。";
+};
+window.stopRecording=()=>{
+ if(mediaRecorder&&mediaRecorder.state!=="inactive")mediaRecorder.stop();
+ $("recordButton").disabled=false;
+};
+window.closeCamera=()=>{
+ if(mediaRecorder&&mediaRecorder.state!=="inactive")mediaRecorder.stop();
+ if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());
+ cameraStream=null;
+ $("cameraModal").classList.remove("show");
+};
+
+window.openTeacherLogin=async()=>{
+ const pin=prompt("先生用暗証番号を入力してください。");
+ if(pin===null)return;
+ const saved=await getSetting("pin");
+ if(pin!==saved){alert("暗証番号が違います。");return;}
+ await renderTeacherTechs();
+ await renderReferences();
+ showPage("teacherPage");
+};
+
+window.changePin=async()=>{
+ const pin=$("newPin").value.trim();
+ if(pin.length<4){alert("4文字以上の暗証番号を入力してください。");return;}
+ await put("settings",{key:"pin",value:pin});
+ $("newPin").value="";
+ alert("暗証番号を変更しました。");
+};
+window.addTech=async()=>{
+ const name=$("newTechName").value.trim();
+ const group=$("newTechGroup").value;
+ if(!name){alert("技の名前を入力してください。");return;}
+ await put("techs",{name,group,icon:"🤸",custom:true});
+ $("newTechName").value="";
+ await renderTechs();await renderTeacherTechs();
+ alert("技を追加しました。");
+};
+
+window.addReference=async()=>{
+ const tech=$("teacherTech").value;
+ const name=$("referenceName").value.trim()||tech+"の見本";
+ const file=$("referenceFile").files[0];
+ if(!file){alert("動画ファイルを選択してください。");return;}
+ if(!file.type.startsWith("video/")){alert("動画ファイルを選択してください。");return;}
+ await add("refs",{tech,name,blob:file,type:file.type,created:new Date().toISOString()});
+ $("referenceName").value="";$("referenceFile").value="";
+ await renderReferences();
+ alert("見本動画を登録しました。");
+};
+
+async function renderReferences() {
+ const refs=await getAll("refs");
+ const selected=currentTech?.name;
+ const filtered=selected?refs.filter(x=>x.tech===selected):refs;
+ $("referenceList").innerHTML=filtered.length?"":"<p class='muted'>登録済み動画はありません。</p>";
+ for(const ref of filtered) {
+  const div=document.createElement("div");div.className="history-item";
+  const info=document.createElement("div");
+  info.innerHTML=`<strong>${escapeHTML(ref.name)}</strong><br><span class="muted">${escapeHTML(ref.tech)}</span>`;
+  const del=document.createElement("button");del.className="btn danger small";del.textContent="削除";
+  del.onclick=async()=>{if(confirm("この見本動画を削除しますか？")){await remove("refs",ref.id);await renderReferences();}};
+  div.append(info,del);$("referenceList").appendChild(div);
+ }
+}
+window.chooseSavedReference=async()=>{
+ if(!currentTech){alert("先に技を選んでください。");return;}
+ const refs=(await getAll("refs")).filter(x=>x.tech===currentTech.name);
+ $("referenceChoices").innerHTML="";
+ if(!refs.length)$("referenceChoices").textContent="この技の見本動画は登録されていません。";
+ for(const ref of refs) {
+  const b=document.createElement("button");
+  b.className="btn secondary";b.style.display="block";b.style.width="100%";b.style.margin="8px 0";
+  b.textContent=ref.name;
+  b.onclick=()=>{
+   const url=URL.createObjectURL(ref.blob);
+   setVideo("reference",url);
+   closeReferenceModal();
+  };
+  $("referenceChoices").appendChild(b);
+ }
+ $("referenceModal").classList.add("show");
+};
+window.closeReferenceModal=()=>$("referenceModal").classList.remove("show");
+
+window.exportReferenceSet=async()=>{
+ const refs=await getAll("refs");
+ if(!refs.length){alert("登録済み見本動画がありません。");return;}
+ if(!window.JSZip){alert("ZIPライブラリを読み込めませんでした。");return;}
+ const zip=new JSZip();
+ const manifest=[];
+ for(let i=0;i<refs.length;i++) {
+  const r=refs[i];
+  const filename=`videos/${i}_${safeName(r.name)}.webm`;
+  zip.file(filename,r.blob);
+  manifest.push({tech:r.tech,name:r.name,filename});
+ }
+ zip.file("manifest.json",JSON.stringify(manifest,null,2));
+ const blob=await zip.generateAsync({type:"blob"});
+ downloadBlob(blob,"MAT-COACHING-見本動画セット.zip");
+};
+function safeName(s){return String(s).replace(/[\\/:*?"<>|]/g,"_").slice(0,60);}
+function downloadBlob(blob,name) {
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");a.href=url;a.download=name;a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),3000);
+}
+window.importReferenceSet=async(event)=>{
+ const file=event.target.files?.[0];if(!file)return;
+ try {
+  const zip=await JSZip.loadAsync(file);
+  const manifestFile=zip.file("manifest.json");
+  if(!manifestFile)throw new Error("manifest.jsonがありません");
+  const manifest=JSON.parse(await manifestFile.async("text"));
+  for(const item of manifest) {
+   const f=zip.file(item.filename);
+   if(!f)continue;
+   const blob=await f.async("blob");
+   await add("refs",{tech:item.tech,name:item.name,blob,type:blob.type||"video/webm",created:new Date().toISOString()});
+  }
+  await renderReferences();
+  alert("見本動画セットを読み込みました。");
+ } catch(e) {
+  console.error(e);alert("ZIPファイルを読み込めませんでした。");
+ }
+ event.target.value="";
+};
+function downloadBlob(blob,name) {
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;a.download=name;a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),3000);
+}
+</script>
+</body>
+</html>
