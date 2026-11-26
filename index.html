@@ -7,14 +7,11 @@
 
 <title>MAT COACHING</title>
 
-<!-- ホーム画面・アプリ起動対応 -->
 <meta name="theme-color" content="#172b4d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT COACHING">
 <meta name="mobile-web-app-capable" content="yes">
-
-<!-- HTML単体でのアプリ表示用 -->
 <meta name="application-name" content="MAT COACHING">
 <meta name="description" content="マット運動の動画比較と学習記録">
 
@@ -366,6 +363,16 @@ footer{text-align:center;color:#888;padding:30px}
 <div id="registeredRefs"></div>
 
 <hr>
+<h3>生徒配布用HTML</h3>
+<p class="small">
+登録したお手本動画を組み込んだ、生徒用HTMLファイルを書き出します。
+</p>
+<button class="green" onclick="exportStudentHTML()">
+生徒配布用HTMLを書き出す
+</button>
+<p id="exportStatus" class="small" aria-live="polite"></p>
+
+<hr>
 <h3>技の追加</h3>
 <input id="newSkillName" placeholder="技名">
 <input id="newSkillGroup" placeholder="技の系統">
@@ -456,6 +463,9 @@ let syncBuffering=false;
 const refVideo=document.getElementById("refVideo");
 const myVideo=document.getElementById("myVideo");
 
+/* 書き出し済みHTMLに埋め込まれた見本動画 */
+window.MAT_EMBEDDED_REFS = null;
+
 function saveName(){
  student=document.getElementById("studentName").value.trim();
  localStorage.setItem("studentName",student);
@@ -465,7 +475,14 @@ function loadName(){
  student=localStorage.getItem("studentName")||"";
  document.getElementById("studentName").value=student;
 }
-function getRefs(){return JSON.parse(localStorage.getItem("matRefs")||"[]")}
+
+/* 埋め込み動画があれば、そちらを優先 */
+function getRefs(){
+ if(Array.isArray(window.MAT_EMBEDDED_REFS)){
+  return window.MAT_EMBEDDED_REFS;
+ }
+ return JSON.parse(localStorage.getItem("matRefs")||"[]");
+}
 function saveRefs(data){localStorage.setItem("matRefs",JSON.stringify(data))}
 function getHistory(){return JSON.parse(localStorage.getItem("matHistory")||"[]")}
 
@@ -1343,6 +1360,101 @@ function deleteRef(i){
  saveRefs(refs);
  renderRegisteredRefs();
  updateRefSelect();
+}
+
+/* 生徒配布用HTMLの書き出し */
+function blobToDataURL(blob){
+ return new Promise((resolve,reject)=>{
+  const reader=new FileReader();
+  reader.onload=()=>resolve(reader.result);
+  reader.onerror=()=>reject(reader.error);
+  reader.readAsDataURL(blob);
+ });
+}
+
+async function exportStudentHTML(){
+ const status=document.getElementById("exportStatus");
+ const refs=getRefs();
+
+ if(!refs.length){
+  alert("登録済みのお手本動画がありません。");
+  return;
+ }
+
+ status.textContent="動画をHTMLに組み込んでいます。しばらくお待ちください。";
+
+ try{
+  const embeddedRefs=[];
+
+  for(const ref of refs){
+   const response=await fetch(ref.url);
+
+   if(!response.ok){
+    throw new Error("動画を読み込めませんでした："+ref.name);
+   }
+
+   const videoBlob=await response.blob();
+   const dataURL=await blobToDataURL(videoBlob);
+
+   embeddedRefs.push({
+    name:ref.name,
+    skill:ref.skill,
+    url:dataURL,
+    fileName:ref.fileName||"reference-video"
+   });
+  }
+
+  const marker="window.MAT_EMBEDDED_REFS = null;";
+  const originalHTML="<!DOCTYPE html>\n"+document.documentElement.outerHTML;
+
+  if(!originalHTML.includes(marker)){
+   throw new Error("HTMLへの動画情報の組み込みに失敗しました。");
+  }
+
+  const safeJSON=JSON.stringify(embeddedRefs)
+   .replace(/</g,"\\u003c")
+   .replace(/\u2028/g,"\\u2028")
+   .replace(/\u2029/g,"\\u2029");
+
+  const exportedHTML=originalHTML.replace(
+   marker,
+   "window.MAT_EMBEDDED_REFS = "+safeJSON+";"
+  );
+
+  const outputBlob=new Blob(
+   [exportedHTML],
+   {type:"text/html;charset=utf-8"}
+  );
+
+  const url=URL.createObjectURL(outputBlob);
+  const a=document.createElement("a");
+
+  a.href=url;
+  a.download="MAT_COACHING_生徒配布用.html";
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+
+  const sizeMB=(outputBlob.size/(1024*1024)).toFixed(1);
+
+  status.textContent=
+   "書き出しが完了しました。ファイルサイズ："+sizeMB+"MB";
+
+ }catch(error){
+  console.error("HTML書き出しエラー:",error);
+
+  status.textContent=
+   "書き出しに失敗しました。動画を再登録してからお試しください。";
+
+  alert(
+   "HTMLを書き出せませんでした。\n"+
+   "登録した動画が現在も読み込めるか確認してください。\n\n"+
+   error.message
+  );
+ }
 }
 
 async function startCamera(){
