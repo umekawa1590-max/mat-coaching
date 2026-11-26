@@ -90,7 +90,7 @@ footer{text-align:center;color:#888;padding:30px}
  margin:10px 0 0;
 }
 
-/* 録画動画保存 */
+/* 動画保存 */
 .camera-save-panel{
  background:#f0f8f4;
  border:1px solid #cce6d7;
@@ -165,6 +165,23 @@ footer{text-align:center;color:#888;padding:30px}
 <div>
 <h3>自分の動画</h3>
 <input type="file" accept="video/*" id="myUpload">
+
+<!-- 選択・撮影した動画を写真アプリに保存するボタン -->
+<div id="selectedVideoSavePanel" class="camera-save-panel hidden">
+ <h3>撮影した動画を保存</h3>
+ <p>選択した動画を写真アプリに保存できます。</p>
+ <button
+  id="saveSelectedVideoButton"
+  class="camera-save-button"
+  onclick="saveSelectedVideoToPhotos()">
+  写真アプリに保存
+ </button>
+ <p class="camera-save-note">
+  ボタンを押すと共有メニューが開きます。共有メニューから「ビデオを保存」を選んでください。
+ </p>
+ <p id="selectedVideoSaveStatus" class="small" aria-live="polite"></p>
+</div>
+
 </div>
 </div>
 </div>
@@ -349,7 +366,6 @@ footer{text-align:center;color:#888;padding:30px}
 
 <div id="cameraStatus" aria-live="polite"></div>
 
-<!-- 録画停止後に表示する保存ボタン -->
 <div id="cameraSavePanel" class="camera-save-panel hidden">
  <h3>撮影した動画を保存</h3>
  <p>録画した動画を写真アプリに保存できます。</p>
@@ -411,6 +427,9 @@ let cameraFacing="environment";
 let recordedVideoBlob=null;
 let recordedVideoFile=null;
 let recordedVideoURL=null;
+
+/* 今回追加：ファイル選択から読み込んだ動画 */
+let selectedVideoFile=null;
 
 let syncClock=0;
 let lastFrameTime=0;
@@ -488,8 +507,24 @@ function escapeHTML(str){
 document.getElementById("refUpload").addEventListener("change",e=>{
  loadVideoFile(e.target.files[0],refVideo);
 });
+
 document.getElementById("myUpload").addEventListener("change",e=>{
- loadVideoFile(e.target.files[0],myVideo);
+ const file=e.target.files[0];
+
+ if(!file){
+  selectedVideoFile=null;
+  document.getElementById("selectedVideoSavePanel").classList.add("hidden");
+  return;
+ }
+
+ loadVideoFile(file,myVideo);
+
+ /* 選択・撮影した動画ファイルを保存対象として保持 */
+ selectedVideoFile=file;
+
+ document.getElementById("selectedVideoSavePanel").classList.remove("hidden");
+ document.getElementById("selectedVideoSaveStatus").textContent=
+  "動画を読み込みました。写真アプリに保存する場合は下のボタンを押してください。";
 });
 
 function loadVideoFile(file,video){
@@ -515,6 +550,61 @@ function updateDurationSlider(video){
  slider.value=0;
  input.value="0";
  video.currentTime=0;
+}
+
+/* 選択した動画を写真アプリに保存 */
+async function saveSelectedVideoToPhotos(){
+ const status=document.getElementById("selectedVideoSaveStatus");
+
+ if(!selectedVideoFile){
+  alert("保存する動画がありません。先に「自分の動画」から動画を撮影してください。");
+  return;
+ }
+
+ if(
+  navigator.share&&
+  navigator.canShare&&
+  navigator.canShare({files:[selectedVideoFile]})
+ ){
+  try{
+   await navigator.share({
+    title:"MAT COACHING 撮影動画",
+    files:[selectedVideoFile]
+   });
+
+   status.textContent="共有メニューを閉じました。「ビデオを保存」を選んだ場合は写真アプリをご確認ください。";
+  }catch(error){
+   if(error.name==="AbortError"){
+    status.textContent="共有をキャンセルしました。もう一度ボタンを押すと再度共有できます。";
+   }else{
+    console.error("動画共有エラー:",error);
+    status.textContent="共有メニューを開けませんでした。動画をダウンロードします。";
+    downloadSelectedVideo();
+   }
+  }
+ }else{
+  status.textContent="この環境では動画の共有に対応していないため、動画をダウンロードします。";
+  downloadSelectedVideo();
+ }
+}
+
+/* 選択した動画のダウンロード */
+function downloadSelectedVideo(){
+ if(!selectedVideoFile)return;
+
+ const url=URL.createObjectURL(selectedVideoFile);
+ const a=document.createElement("a");
+
+ a.href=url;
+ a.download=selectedVideoFile.name||"mat-coaching-video";
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+
+ setTimeout(()=>URL.revokeObjectURL(url),10000);
+
+ document.getElementById("selectedVideoSaveStatus").textContent=
+  "動画をダウンロードしました。ファイルアプリから動画を開き、共有メニューで写真アプリに保存してください。";
 }
 
 /* お手本 */
@@ -1069,15 +1159,18 @@ async function openGeminiAnalysis(){
 
  status.textContent="共有の準備をしています。";
 
- if(recordedVideoFile){
+ /* アプリ内録画がある場合は、そちらを優先 */
+ const videoToShare=recordedVideoFile||selectedVideoFile;
+
+ if(videoToShare){
   try{
    const shareData={
     title:"MAT COACHING 動画分析",
     text:prompt,
-    files:[recordedVideoFile]
+    files:[videoToShare]
    };
 
-   if(navigator.share&&navigator.canShare&&navigator.canShare({files:[recordedVideoFile]})){
+   if(navigator.share&&navigator.canShare&&navigator.canShare({files:[videoToShare]})){
     const sharePromise=navigator.share(shareData);
 
     copyPromptInBackground(prompt);
@@ -1103,9 +1196,9 @@ async function openGeminiAnalysis(){
   }
  }
 
- status.textContent=recordedVideoFile
+ status.textContent=videoToShare
   ?"この環境では動画の直接共有に対応していません。Geminiを開きます。"
-  :"アプリ内に録画動画がありません。Geminiを開きます。";
+  :"動画が読み込まれていません。Geminiを開きます。";
 
  openGeminiFallback(prompt);
 }
@@ -1690,7 +1783,6 @@ function startRecording(){
  recordedVideoBlob=null;
  recordedVideoFile=null;
 
- /* 新しい録画を始めたら保存ボタンを隠す */
  document.getElementById("cameraSavePanel").classList.add("hidden");
 
  const status=document.getElementById("cameraStatus");
@@ -1743,7 +1835,6 @@ function startRecording(){
     status.textContent=
      `録画完了（${sizeMB}MB）。下のボタンから写真アプリに保存できます。`;
 
-    /* 録画完了後に保存ボタンを表示 */
     document.getElementById("cameraSavePanel").classList.remove("hidden");
    }else{
     status.textContent=
@@ -1770,11 +1861,7 @@ function stopRecording(){
  }
 }
 
-/*
- * 録画停止後に写真アプリへ保存する
- * iOSでは共有メニューが開くので、
- * ユーザーが「ビデオを保存」を選択する
- */
+/* 録画停止後に写真アプリへ保存する */
 async function saveRecordedVideoToPhotos(){
  const status=document.getElementById("cameraStatus");
 
