@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -38,7 +39,58 @@ video{width:100%;display:block;max-height:65vh;background:#000}
 footer{text-align:center;color:#888;padding:30px}
 .time-label{display:flex;justify-content:space-between;font-size:13px;color:#667085}
 .history-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-.history-actions button{margin:0}
+
+/* Gemini動画分析 */
+.gemini-panel{
+ background:#f5f8ff;
+ border:1px solid #d8e4f7;
+ border-radius:12px;
+ padding:16px;
+ margin:12px 0 16px;
+}
+.gemini-heading{
+ display:flex;
+ align-items:center;
+ gap:9px;
+ font-weight:bold;
+ font-size:17px;
+ color:#172b4d;
+ margin-bottom:8px;
+}
+.gemini-icon{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ width:34px;
+ height:34px;
+ border-radius:50%;
+ background:#e3edff;
+ color:#1967d2;
+ font-size:20px;
+}
+.gemini-description{
+ font-size:14px;
+ color:#526078;
+ line-height:1.7;
+ margin:8px 0 12px;
+}
+.gemini-button{
+ width:100%;
+ margin:0;
+ padding:15px;
+ background:#1967d2;
+ color:white;
+ font-size:16px;
+ border-radius:10px;
+}
+.gemini-button:hover{background:#1557b0}
+.gemini-note{
+ font-size:12px;
+ color:#667085;
+ line-height:1.6;
+ margin:10px 0 0;
+}
+
 @media(max-width:700px){
  .video-grid{grid-template-columns:1fr}
  .start-row{grid-template-columns:1fr}
@@ -210,6 +262,25 @@ oninput="seekBoth(this.value)">
 <div id="observationList"></div>
 <h3>気づいたこと</h3>
 <textarea id="studentMemo" placeholder="自分の動きで気づいたこと、意識したことなど"></textarea>
+
+<!-- Gemini動画分析リンク：自分の気づきの直下 -->
+<div class="gemini-panel">
+ <div class="gemini-heading">
+  <span class="gemini-icon">✦</span>
+  Gemini AI動画分析
+ </div>
+ <p class="gemini-description">
+  撮影した自分の動画をGeminiに添付して、技の完成度やフォーム、改善点、練習方法を詳しく分析してもらおう。
+ </p>
+ <button class="gemini-button" onclick="openGeminiAnalysis()">
+  ✦ Geminiで動画を分析する
+ </button>
+ <p class="gemini-note">
+  ※ボタンを押すと分析用の指示文がコピーされ、Geminiが開きます。Geminiの画面で自分の動画を添付し、指示文を貼り付けて送信してください。動画は自動送信されません。
+ </p>
+ <p id="geminiStatus" class="small" aria-live="polite"></p>
+</div>
+
 <button class="green" onclick="generateAdvice()">動作分析アドバイスを生成</button>
 <div id="adviceResult" style="margin-top:16px"></div>
 </div>
@@ -883,6 +954,200 @@ function generateAdvice(){
  html+=`<hr><p class="small">このアドバイスは、選択した観察項目と技の基本ポイントをもとに生成しています。動画を自動認識するAIや骨格検知による分析ではありません。</p>`;
 
  document.getElementById("adviceResult").innerHTML=html;
+}
+
+/* Gemini動画分析用の指示文を作成 */
+function createGeminiPrompt(){
+ const selectedObservations=[];
+
+ observationItems.forEach((item,i)=>{
+  const select=document.getElementById("obs"+i);
+  const note=document.getElementById("obsNote"+i);
+
+  if(!select||!note)return;
+
+  const result=select.value;
+  const detail=note.value.trim();
+
+  let resultText="判断できない";
+  if(result==="match")resultText="お手本に近い";
+  if(result==="diff")resultText="違いがある";
+
+  selectedObservations.push(
+   `・${item}：${resultText}${detail?"（気づき："+detail+"）":""}`
+  );
+ });
+
+ const memo=document.getElementById("studentMemo").value.trim();
+
+ return `あなたは、マット運動の指導と動作分析に詳しい体育指導者です。
+添付した動画を実際に確認し、技の完成度と動作の改善点について分析してください。
+
+【分析する技】
+${currentSkill||"技名未設定"}
+
+【学習者】
+${student||"未登録"}
+
+【本人が行った観察】
+${selectedObservations.join("\n")||"観察結果なし"}
+
+【本人の気づき】
+${memo||"記入なし"}
+
+【分析してほしい内容】
+
+1. 技の完成度
+・技の動作がどの程度できているか
+・動作の開始から終了までの流れ
+・姿勢、手足の位置、重心移動、タイミング、着地やバランス
+・技の重要なポイントが実現できているか
+
+2. 良い点
+・動画から確認できる良い動作
+・できている技術的なポイント
+・今後も継続したい動き
+
+3. 改善点
+・お手本と比較して改善できる部分
+・どの場面で、どのような違いがあるか
+・改善する優先順位
+
+4. 具体的な改善方法
+・身体のどの部分をどう動かすとよいか
+・動作のタイミングや姿勢をどう意識するか
+・実践しやすい練習方法
+
+5. おすすめの練習メニュー
+・段階的に取り組める練習を3つ
+・それぞれの練習の目的
+・練習回数や意識するポイント
+
+6. 次回の練習課題
+・次の練習で最も優先する課題を1つ
+・達成できたか判断するための具体的な目安
+
+【回答形式】
+次の見出しに分けて、日本語で具体的に説明してください。
+
+■ 総合評価
+■ 技の完成度
+■ できている点
+■ 改善が必要な点
+■ 具体的な改善方法
+■ おすすめの練習メニュー
+■ 次回の練習課題
+
+【分析時の注意】
+・動画で実際に確認できる事実と、推測を区別してください。
+・見えない部分や判断できない動作は、無理に評価せず「確認できない」としてください。
+・動画の角度や画質による限界も考慮してください。
+・本人の観察結果も参考にしながら、動画の内容を優先して分析してください。
+・できている点を認めたうえで、改善方法を具体的かつ前向きに伝えてください。
+・安全性を優先し、無理な練習や危険な動作を勧めないでください。
+・動画だけでは判断できない技術的な点は、断定しないでください。`;
+}
+
+/* Geminiを開いて分析指示文をコピー */
+async function openGeminiAnalysis(){
+ const status=document.getElementById("geminiStatus");
+ const prompt=createGeminiPrompt();
+
+ /* ポップアップブロックを避けるため、先にGeminiを開く */
+ const geminiWindow=window.open(
+  "https://gemini.google.com/app",
+  "_blank"
+ );
+
+ if(!geminiWindow){
+  status.textContent="Geminiを開けませんでした。ブラウザのポップアップ設定をご確認ください。";
+  alert("Geminiを開けませんでした。ポップアップを許可してから、もう一度お試しください。");
+  return;
+ }
+
+ try{
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+   await navigator.clipboard.writeText(prompt);
+   status.textContent="分析用の指示文をコピーしました。Geminiに動画を添付して、指示文を貼り付けてください。";
+   alert("分析用の指示文をコピーしました。\n\nGeminiに自分の動画を添付し、入力欄に貼り付けて送信してください。");
+  }else{
+   const copied=copyTextFallback(prompt);
+   if(copied){
+    status.textContent="分析用の指示文をコピーしました。Geminiに動画を添付して貼り付けてください。";
+    alert("分析用の指示文をコピーしました。\n\nGeminiに自分の動画を添付し、入力欄に貼り付けて送信してください。");
+   }else{
+    status.textContent="自動コピーできませんでした。コピー用の文章を表示します。";
+    showPromptForManualCopy(prompt);
+   }
+  }
+ }catch(error){
+  const copied=copyTextFallback(prompt);
+  if(copied){
+   status.textContent="分析用の指示文をコピーしました。Geminiに貼り付けてください。";
+   alert("分析用の指示文をコピーしました。\nGeminiに動画を添付して貼り付けてください。");
+  }else{
+   status.textContent="自動コピーできませんでした。下の文章を手動でコピーしてください。";
+   showPromptForManualCopy(prompt);
+  }
+ }
+}
+
+/* Clipboard APIが使えない場合のコピー */
+function copyTextFallback(text){
+ const textarea=document.createElement("textarea");
+ textarea.value=text;
+ textarea.style.position="fixed";
+ textarea.style.left="-9999px";
+ textarea.style.top="0";
+ textarea.setAttribute("readonly","");
+ document.body.appendChild(textarea);
+ textarea.select();
+ textarea.setSelectionRange(0,textarea.value.length);
+
+ let result=false;
+ try{
+  result=document.execCommand("copy");
+ }catch(error){
+  result=false;
+ }
+
+ textarea.remove();
+ return result;
+}
+
+/* コピーできなかった場合に手動コピー用の文章を表示 */
+function showPromptForManualCopy(prompt){
+ const old=document.getElementById("geminiManualPrompt");
+ if(old)old.remove();
+
+ const wrapper=document.createElement("div");
+ wrapper.id="geminiManualPrompt";
+ wrapper.className="observation";
+
+ const title=document.createElement("strong");
+ title.textContent="分析指示文（手動でコピーしてください）";
+
+ const textarea=document.createElement("textarea");
+ textarea.value=prompt;
+ textarea.style.minHeight="220px";
+ textarea.style.marginTop="10px";
+ textarea.addEventListener("click",()=>textarea.select());
+
+ const copyButton=document.createElement("button");
+ copyButton.className="secondary";
+ copyButton.textContent="文章を選択する";
+ copyButton.onclick=()=>{
+  textarea.focus();
+  textarea.select();
+ };
+
+ wrapper.appendChild(title);
+ wrapper.appendChild(textarea);
+ wrapper.appendChild(copyButton);
+
+ document.getElementById("geminiStatus").after(wrapper);
+ textarea.focus();
+ textarea.select();
 }
 
 /* 学習記録 */
