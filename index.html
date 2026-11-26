@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -166,7 +167,6 @@ footer{text-align:center;color:#888;padding:30px}
 <h3>自分の動画</h3>
 <input type="file" accept="video/*" id="myUpload">
 
-<!-- 選択・撮影した動画を写真アプリに保存するボタン -->
 <div id="selectedVideoSavePanel" class="camera-save-panel hidden">
  <h3>撮影した動画を保存</h3>
  <p>選択した動画を写真アプリに保存できます。</p>
@@ -232,11 +232,6 @@ footer{text-align:center;color:#888;padding:30px}
 </select>
 </div>
 
-<div style="margin-top:12px">
-<label>比較再生位置</label>
-<input type="range" id="syncSeek" min="0" max="1000" value="0" oninput="seekBoth(this.value)">
-<p class="small" id="syncStatus">動画を読み込んでください。</p>
-</div>
 </div>
 
 <div class="video-grid">
@@ -428,7 +423,7 @@ let recordedVideoBlob=null;
 let recordedVideoFile=null;
 let recordedVideoURL=null;
 
-/* 今回追加：ファイル選択から読み込んだ動画 */
+/* ファイル選択から読み込んだ動画 */
 let selectedVideoFile=null;
 
 let syncClock=0;
@@ -518,8 +513,6 @@ document.getElementById("myUpload").addEventListener("change",e=>{
  }
 
  loadVideoFile(file,myVideo);
-
- /* 選択・撮影した動画ファイルを保存対象として保持 */
  selectedVideoFile=file;
 
  document.getElementById("selectedVideoSavePanel").classList.remove("hidden");
@@ -534,7 +527,6 @@ function loadVideoFile(file,video){
  video.load();
  video.onloadedmetadata=()=>{
   updateDurationSlider(video);
-  updateStatus();
  };
 }
 
@@ -649,7 +641,6 @@ function syncStartSlider(which){
 
  stopBoth();
  setVideoTime(video,value);
- updateStatus();
 }
 
 function moveStartSlider(which,value){
@@ -663,7 +654,6 @@ function moveStartSlider(which,value){
 
  stopBoth();
  setVideoTime(video,time);
- updateStatus();
 }
 
 function setStartFromCurrent(which){
@@ -697,7 +687,6 @@ function stopBoth(){
 
 function pauseBoth(){
  stopBoth();
- updateStatus();
 }
 
 function waitForSeek(video){
@@ -780,7 +769,6 @@ function syncLoop(){
 
  if(refVideo.ended||myVideo.ended){
   stopBoth();
-  updateStatus();
   return;
  }
 
@@ -829,11 +817,8 @@ function syncLoop(){
 
  if(refTarget>=refVideo.duration||myTarget>=myVideo.duration){
   stopBoth();
-  updateStatus();
   return;
  }
-
- updateStatus();
 
  rafId=requestAnimationFrame(syncLoop);
 }
@@ -857,10 +842,6 @@ function resetBoth(){
 
  setVideoTime(refVideo,getStart("ref"));
  setVideoTime(myVideo,getStart("my"));
-
- document.getElementById("syncSeek").value=0;
-
- updateStatus();
 }
 
 function stepBoth(sec){
@@ -868,8 +849,6 @@ function stepBoth(sec){
 
  setVideoTime(refVideo,refVideo.currentTime+sec);
  setVideoTime(myVideo,myVideo.currentTime+sec);
-
- updateStatus();
 }
 
 function individualPlay(which){
@@ -887,7 +866,6 @@ function individualStep(which,sec){
  stopBoth();
  const v=which==="ref"?refVideo:myVideo;
  setVideoTime(v,v.currentTime+sec);
- updateStatus();
 }
 
 function changeSpeed(){
@@ -899,28 +877,6 @@ function changeSpeed(){
  if(syncPlaying){
   syncSpeed=speed;
  }
-}
-
-/* 比較スライダー */
-function seekBoth(value){
- stopBoth();
-
- const ratio=Number(value)/1000;
- const rs=getStart("ref");
- const ms=getStart("my");
-
- const refRemaining=Math.max(0,(refVideo.duration||0)-rs);
- const myRemaining=Math.max(0,(myVideo.duration||0)-ms);
- const common=Math.min(refRemaining,myRemaining);
-
- const offset=ratio*common;
-
- setVideoTime(refVideo,rs+offset);
- setVideoTime(myVideo,ms+offset);
-
- syncClock=offset;
-
- updateStatus();
 }
 
 /* 動画の操作時に同期再生を解除 */
@@ -936,19 +892,8 @@ myVideo.addEventListener("pause",()=>{
  }
 });
 
-refVideo.addEventListener("timeupdate",updateStatus);
-myVideo.addEventListener("timeupdate",updateStatus);
-
 refVideo.addEventListener("ended",pauseBoth);
 myVideo.addEventListener("ended",pauseBoth);
-
-function updateStatus(){
- const r=refVideo.currentTime||0;
- const m=myVideo.currentTime||0;
-
- document.getElementById("syncStatus").textContent=
- `お手本 ${r.toFixed(2)}秒 / 自分 ${m.toFixed(2)}秒`;
-}
 
 /* 観察 */
 const observationItems=[
@@ -1159,7 +1104,6 @@ async function openGeminiAnalysis(){
 
  status.textContent="共有の準備をしています。";
 
- /* アプリ内録画がある場合は、そちらを優先 */
  const videoToShare=recordedVideoFile||selectedVideoFile;
 
  if(videoToShare){
