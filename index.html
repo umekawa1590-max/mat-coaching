@@ -270,13 +270,13 @@ oninput="seekBoth(this.value)">
   Gemini AI動画分析
  </div>
  <p class="gemini-description">
-  撮影した自分の動画をGeminiに添付して、技の完成度やフォーム、改善点、練習方法を詳しく分析してもらおう。
+  アプリ内で撮影した自分の動画をGeminiに共有して、技の完成度やフォーム、改善点、練習方法を詳しく分析してもらおう。
  </p>
  <button class="gemini-button" onclick="openGeminiAnalysis()">
   ✦ Geminiで動画を分析する
  </button>
  <p class="gemini-note">
-  ※ボタンを押すと分析用の指示文がコピーされ、Geminiが開きます。Geminiの画面で自分の動画を添付し、指示文を貼り付けて送信してください。動画は自動送信されません。
+  ※録画済みの動画と分析用の指示文を共有メニューに渡します。共有先にGeminiが表示されたら選択してください。表示されない場合は、保存した動画をGeminiに添付してください。
  </p>
  <p id="geminiStatus" class="small" aria-live="polite"></p>
 </div>
@@ -389,6 +389,11 @@ let cameraStream=null;
 let mediaRecorder=null;
 let recordedChunks=[];
 let cameraFacing="environment";
+
+/* 録画動画の保持 */
+let recordedVideoBlob=null;
+let recordedVideoFile=null;
+let recordedVideoURL=null;
 
 /* 同期再生用 */
 let syncClock=0;
@@ -570,7 +575,7 @@ function setVideoTime(video,time){
  video.currentTime=Math.max(0,Math.min(max,time));
 }
 
-/* 同時再生・同期 */
+/* 同期再生・同期 */
 function stopBoth(){
  syncPlaying=false;
  syncBuffering=false;
@@ -677,10 +682,8 @@ function syncLoop(){
  let delta=(now-lastFrameTime)/1000;
  lastFrameTime=now;
 
- /* フレーム間隔が極端に長い場合は時間を飛ばさない */
  delta=Math.min(delta,0.1);
 
- /* バッファリング中は両動画を一時停止して時計を止める */
  if(refVideo.readyState<3||myVideo.readyState<3){
   if(!syncBuffering){
    refVideo.pause();
@@ -692,7 +695,6 @@ function syncLoop(){
   return;
  }
 
- /* バッファリングから復帰 */
  if(syncBuffering){
   syncBuffering=false;
 
@@ -716,11 +718,9 @@ function syncLoop(){
  const refTarget=rs+syncClock;
  const myTarget=ms+syncClock;
 
- /* 両動画を共通の経過時間に合わせる */
  correctVideo(refVideo,refTarget);
  correctVideo(myVideo,myTarget);
 
- /* いずれかの動画が終わったら終了 */
  if(refTarget>=refVideo.duration||myTarget>=myVideo.duration){
   stopBoth();
   updateStatus();
@@ -732,7 +732,6 @@ function syncLoop(){
  rafId=requestAnimationFrame(syncLoop);
 }
 
-/* 時間差が大きい場合だけ補正する */
 function correctVideo(video,target){
  if(!isFinite(target))return;
 
@@ -740,7 +739,6 @@ function correctVideo(video,target){
  const safeTarget=Math.max(0,Math.min(max,target));
  const diff=video.currentTime-safeTarget;
 
- /* 小さなズレは無視、大きなズレは補正 */
  if(Math.abs(diff)>0.12){
   video.currentTime=safeTarget;
  }
@@ -1048,12 +1046,65 @@ ${memo||"記入なし"}
 ・動画だけでは判断できない技術的な点は、断定しないでください。`;
 }
 
-/* Geminiを開いて分析指示文をコピー */
+/* Geminiへ動画と指示文を共有 */
 async function openGeminiAnalysis(){
  const status=document.getElementById("geminiStatus");
  const prompt=createGeminiPrompt();
 
- /* ポップアップブロックを避けるため、先にGeminiを開く */
+ status.textContent="共有の準備をしています。";
+
+ /* 録画動画がある場合は動画と指示文を共有する */
+ if(recordedVideoFile){
+  try{
+   const shareData={
+    title:"MAT COACHING 動画分析",
+    text:prompt,
+    files:[recordedVideoFile]
+   };
+
+   if(navigator.share&&navigator.canShare&&navigator.canShare({files:[recordedVideoFile]})){
+    /*
+     * 共有処理はクリック直後に開始する必要があるため、
+     * navigator.shareを先に呼び出す
+     */
+    const sharePromise=navigator.share(shareData);
+
+    /* 従来のコピー機能も維持 */
+    copyPromptInBackground(prompt);
+
+    status.textContent="動画と分析用の指示文を共有メニューに渡しました。Geminiを選択してください。";
+
+    try{
+     await sharePromise;
+     status.textContent="共有メニューを閉じました。Geminiへの共有が完了したか確認してください。";
+    }catch(error){
+     if(error.name==="AbortError"){
+      status.textContent="共有をキャンセルしました。もう一度ボタンを押すと共有できます。";
+     }else{
+      console.error("動画共有エラー:",error);
+      status.textContent="動画を共有できませんでした。保存した動画をGeminiに添付してください。";
+      openGeminiFallback(prompt);
+     }
+    }
+    return;
+   }
+  }catch(error){
+   console.error("共有準備エラー:",error);
+  }
+ }
+
+ /* 共有に対応しない場合は従来のGemini起動・コピー方式 */
+ status.textContent=recordedVideoFile
+  ?"この環境では動画の直接共有に対応していません。Geminiを開きます。"
+  :"アプリ内に録画動画がありません。Geminiを開きます。";
+
+ openGeminiFallback(prompt);
+}
+
+/* 従来のGemini起動・コピー */
+function openGeminiFallback(prompt){
+ const status=document.getElementById("geminiStatus");
+
  const geminiWindow=window.open(
   "https://gemini.google.com/app",
   "_blank"
@@ -1065,28 +1116,32 @@ async function openGeminiAnalysis(){
   return;
  }
 
+ copyPromptInBackground(prompt);
+}
+
+/* 分析用の指示文をコピー */
+async function copyPromptInBackground(prompt){
+ const status=document.getElementById("geminiStatus");
+
  try{
   if(navigator.clipboard&&navigator.clipboard.writeText){
    await navigator.clipboard.writeText(prompt);
-   status.textContent="分析用の指示文をコピーしました。Geminiに動画を添付して、指示文を貼り付けてください。";
-   alert("分析用の指示文をコピーしました。\n\nGeminiに自分の動画を添付し、入力欄に貼り付けて送信してください。");
+   status.textContent="分析用の指示文もコピーしました。Geminiの入力欄に貼り付けてください。";
   }else{
    const copied=copyTextFallback(prompt);
    if(copied){
-    status.textContent="分析用の指示文をコピーしました。Geminiに動画を添付して貼り付けてください。";
-    alert("分析用の指示文をコピーしました。\n\nGeminiに自分の動画を添付し、入力欄に貼り付けて送信してください。");
+    status.textContent="分析用の指示文もコピーしました。Geminiの入力欄に貼り付けてください。";
    }else{
-    status.textContent="自動コピーできませんでした。コピー用の文章を表示します。";
+    status.textContent="指示文を自動コピーできませんでした。手動でコピーしてください。";
     showPromptForManualCopy(prompt);
    }
   }
  }catch(error){
   const copied=copyTextFallback(prompt);
   if(copied){
-   status.textContent="分析用の指示文をコピーしました。Geminiに貼り付けてください。";
-   alert("分析用の指示文をコピーしました。\nGeminiに動画を添付して貼り付けてください。");
+   status.textContent="分析用の指示文もコピーしました。Geminiの入力欄に貼り付けてください。";
   }else{
-   status.textContent="自動コピーできませんでした。下の文章を手動でコピーしてください。";
+   status.textContent="指示文を自動コピーできませんでした。手動でコピーしてください。";
    showPromptForManualCopy(prompt);
   }
  }
@@ -1333,14 +1388,12 @@ function saveHistoryImage(index){
  ctx.fillStyle="#f3f5f8";
  ctx.fillRect(0,0,width,height);
 
- /* 背景カード */
  ctx.fillStyle="#ffffff";
  roundRect(ctx,25,25,width-50,height-50,24);
  ctx.fill();
 
  let y=padding+10;
 
- /* ヘッダー */
  ctx.fillStyle="#172b4d";
  ctx.fillRect(25,25,width-50,110);
 
@@ -1354,7 +1407,6 @@ function saveHistoryImage(index){
 
  y+=120;
 
- /* 技名 */
  ctx.fillStyle="#172b4d";
  setFont(34,"bold");
 
@@ -1364,7 +1416,6 @@ function saveHistoryImage(index){
   y+=45;
  });
 
- /* 名前・日時 */
  y+=5;
  ctx.fillStyle="#667085";
  setFont(22);
@@ -1373,7 +1424,6 @@ function saveHistoryImage(index){
  ctx.fillText("記録日時："+(record.date||""),padding,y);
  y+=42;
 
- /* 区切り線 */
  ctx.strokeStyle="#e0e5ec";
  ctx.lineWidth=2;
  ctx.beginPath();
@@ -1383,7 +1433,6 @@ function saveHistoryImage(index){
 
  y+=35;
 
- /* 各評価項目 */
  sections.forEach(section=>{
   if(!section.items.length)return;
 
@@ -1413,7 +1462,6 @@ function saveHistoryImage(index){
   y+=12;
  });
 
- /* 気づいたこと */
  if(record.memo&&record.memo.trim()){
   ctx.strokeStyle="#e0e5ec";
   ctx.beginPath();
@@ -1438,12 +1486,10 @@ function saveHistoryImage(index){
   });
  }
 
- /* フッター */
  ctx.fillStyle="#667085";
  setFont(18);
  ctx.fillText("MAT COACHING  |  学習の振り返り",padding,height-55);
 
- /* PNG保存 */
  const safeDate=String(record.date||"record")
   .replace(/[\\/:*?"<>|]/g,"-")
   .replace(/\s+/g,"_");
@@ -1601,34 +1647,124 @@ async function switchCamera(){
  cameraFacing=cameraFacing==="environment"?"user":"environment";
  await startCamera();
 }
+
+/* MediaRecorderが使える動画形式を選択 */
+function getSupportedRecordingType(){
+ const types=[
+  "video/mp4",
+  "video/webm;codecs=vp9,opus",
+  "video/webm;codecs=vp8,opus",
+  "video/webm"
+ ];
+
+ for(const type of types){
+  if(MediaRecorder.isTypeSupported(type)){
+   return type;
+  }
+ }
+ return "";
+}
+
+/* 録画開始 */
 function startRecording(){
  if(!cameraStream){
   alert("先にカメラを起動してください");
   return;
  }
+
+ if(!window.MediaRecorder){
+  alert("このブラウザでは動画撮影に対応していません。");
+  return;
+ }
+
  recordedChunks=[];
- mediaRecorder=new MediaRecorder(cameraStream);
- mediaRecorder.ondataavailable=e=>{
-  if(e.data.size>0)recordedChunks.push(e.data);
- };
- mediaRecorder.onstop=()=>{
-  const blob=new Blob(recordedChunks,{type:mediaRecorder.mimeType||"video/webm"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;
-  a.download="mat-coaching-video.webm";
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),10000);
- };
- mediaRecorder.start();
- document.getElementById("cameraStatus").textContent="録画中";
+ recordedVideoBlob=null;
+ recordedVideoFile=null;
+
+ const status=document.getElementById("cameraStatus");
+ status.textContent="録画を開始しています。";
+
+ try{
+  const mimeType=getSupportedRecordingType();
+  const options=mimeType?{mimeType}:undefined;
+
+  mediaRecorder=new MediaRecorder(cameraStream,options);
+
+  mediaRecorder.ondataavailable=e=>{
+   if(e.data&&e.data.size>0){
+    recordedChunks.push(e.data);
+   }
+  };
+
+  mediaRecorder.onerror=e=>{
+   console.error("録画エラー:",e);
+   status.textContent="録画中にエラーが発生しました。";
+  };
+
+  mediaRecorder.onstop=()=>{
+   const actualType=mediaRecorder.mimeType||mimeType||"video/webm";
+   recordedVideoBlob=new Blob(recordedChunks,{type:actualType});
+
+   const extension=actualType.toLowerCase().includes("mp4")?"mp4":"webm";
+   const filename="mat-coaching-video."+extension;
+
+   try{
+    recordedVideoFile=new File(
+     [recordedVideoBlob],
+     filename,
+     {type:actualType,lastModified:Date.now()}
+    );
+   }catch(error){
+    recordedVideoFile=null;
+    console.error("動画ファイル作成エラー:",error);
+   }
+
+   /* 以前の動画URLを解放 */
+   if(recordedVideoURL){
+    URL.revokeObjectURL(recordedVideoURL);
+   }
+
+   recordedVideoURL=URL.createObjectURL(recordedVideoBlob);
+
+   /* 従来どおり端末にも保存 */
+   const a=document.createElement("a");
+   a.href=recordedVideoURL;
+   a.download=filename;
+   document.body.appendChild(a);
+   a.click();
+   a.remove();
+
+   const sizeMB=(recordedVideoBlob.size/(1024*1024)).toFixed(1);
+
+   if(recordedVideoFile){
+    status.textContent=
+     `録画完了：動画を保存しました（${sizeMB}MB）。Gemini分析ボタンから動画を共有できます。`;
+   }else{
+    status.textContent=
+     "録画は完了しましたが、共有用ファイルを作成できませんでした。保存した動画を手動で添付してください。";
+   }
+
+   recordedChunks=[];
+  };
+
+  mediaRecorder.start();
+  status.textContent="録画中";
+ }catch(error){
+  console.error("録画開始エラー:",error);
+  status.textContent="録画を開始できませんでした。";
+  alert("録画を開始できませんでした。ブラウザの対応状況をご確認ください。");
+ }
 }
+
+/* 録画停止 */
 function stopRecording(){
  if(mediaRecorder&&mediaRecorder.state!=="inactive"){
   mediaRecorder.stop();
-  document.getElementById("cameraStatus").textContent="録画終了";
+  document.getElementById("cameraStatus").textContent="動画を保存しています...";
  }
 }
+
+/* カメラ停止 */
 function stopCamera(){
  if(cameraStream){
   cameraStream.getTracks().forEach(t=>t.stop());
