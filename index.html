@@ -95,7 +95,6 @@ footer{text-align:center;color:#888;padding:30px}
 </div>
 </div>
 
-<!-- 同時再生コントロール -->
 <div class="panel" id="playbackPanel">
 <h2>同時再生コントロール</h2>
 
@@ -168,7 +167,6 @@ oninput="seekBoth(this.value)">
 </div>
 </div>
 
-<!-- 動画 -->
 <div class="video-grid">
 <div class="video-box">
 <div class="video-title">お手本</div>
@@ -318,6 +316,12 @@ let mediaRecorder=null;
 let recordedChunks=[];
 let cameraFacing="environment";
 
+/* 同期再生用 */
+let syncClock=0;
+let lastFrameTime=0;
+let syncSpeed=1;
+let syncBuffering=false;
+
 const refVideo=document.getElementById("refVideo");
 const myVideo=document.getElementById("myVideo");
 
@@ -395,6 +399,7 @@ document.getElementById("myUpload").addEventListener("change",e=>{
 
 function loadVideoFile(file,video){
  if(!file)return;
+ stopBoth();
  video.src=URL.createObjectURL(file);
  video.load();
  video.onloadedmetadata=()=>{
@@ -434,6 +439,7 @@ document.getElementById("refSelect").addEventListener("change",e=>{
  const list=getRefs().filter(r=>r.skill===currentSkill);
  const item=list[index];
  if(item){
+  stopBoth();
   refVideo.src=item.url;
   refVideo.load();
  }
@@ -457,7 +463,7 @@ function syncStartSlider(which){
  slider.value=duration>0?(value/duration)*1000:0;
 
  stopBoth();
- video.currentTime=value;
+ setVideoTime(video,value);
  updateStatus();
 }
 
@@ -471,7 +477,7 @@ function moveStartSlider(which,value){
  input.value=time.toFixed(1);
 
  stopBoth();
- video.currentTime=time;
+ setVideoTime(video,time);
  updateStatus();
 }
 
@@ -483,19 +489,41 @@ function setStartFromCurrent(which){
  syncStartSlider(which);
 }
 
-/* 同時再生 */
+/* 時刻設定 */
+function setVideoTime(video,time){
+ if(!isFinite(time))return;
+ const max=video.duration||0;
+ video.currentTime=Math.max(0,Math.min(max,time));
+}
+
+/* 同時再生・同期 */
 function stopBoth(){
  syncPlaying=false;
+ syncBuffering=false;
+
  if(rafId!==null){
   cancelAnimationFrame(rafId);
   rafId=null;
  }
+
  refVideo.pause();
  myVideo.pause();
 }
+
 function pauseBoth(){
  stopBoth();
  updateStatus();
+}
+
+function waitForSeek(video){
+ return new Promise(resolve=>{
+  if(!video.seeking){
+   resolve();
+   return;
+  }
+  video.addEventListener("seeked",resolve,{once:true});
+  setTimeout(resolve,500);
+ });
 }
 
 async function playBoth(){
@@ -509,97 +537,190 @@ async function playBoth(){
  const rs=getStart("ref");
  const ms=getStart("my");
 
- await Promise.all([ensureReady(refVideo),ensureReady(myVideo)]);
+ await Promise.all([
+  waitUntilReady(refVideo),
+  waitUntilReady(myVideo)
+ ]);
 
- refVideo.currentTime=Math.min(rs,refVideo.duration||rs);
- myVideo.currentTime=Math.min(ms,myVideo.duration||ms);
+ setVideoTime(refVideo,rs);
+ setVideoTime(myVideo,ms);
 
- const speed=Number(document.getElementById("playSpeed").value);
- refVideo.playbackRate=speed;
- myVideo.playbackRate=speed;
+ await Promise.all([
+  waitForSeek(refVideo),
+  waitForSeek(myVideo)
+ ]);
+
+ syncSpeed=Number(document.getElementById("playSpeed").value);
+
+ refVideo.playbackRate=syncSpeed;
+ myVideo.playbackRate=syncSpeed;
 
  try{
-  await Promise.all([refVideo.play(),myVideo.play()]);
+  await Promise.all([
+   refVideo.play(),
+   myVideo.play()
+  ]);
  }catch(e){
   pauseBoth();
   alert("動画の再生を開始できませんでした");
   return;
  }
 
+ syncClock=0;
+ lastFrameTime=performance.now();
+ syncBuffering=false;
  syncPlaying=true;
+
  syncLoop();
 }
 
-function ensureReady(v){
+function waitUntilReady(video){
  return new Promise(resolve=>{
-  if(v.readyState>=2)return resolve();
-  v.addEventListener("loadeddata",resolve,{once:true});
-  v.addEventListener("error",resolve,{once:true});
+  if(video.readyState>=2){
+   resolve();
+   return;
+  }
+
+  const done=()=>resolve();
+
+  video.addEventListener("loadeddata",done,{once:true});
+  video.addEventListener("error",done,{once:true});
+
+  setTimeout(done,5000);
  });
 }
 
 function syncLoop(){
  if(!syncPlaying)return;
 
- if(refVideo.paused||myVideo.paused){
+ if(refVideo.ended||myVideo.ended){
   stopBoth();
+  updateStatus();
   return;
  }
 
- const rs=getStart("ref");
- const ms=getStart("my");
- const elapsed=refVideo.currentTime-rs;
- const expected=ms+elapsed;
+ const now=performance.now();
+ let delta=(now-lastFrameTime)/1000;
+ lastFrameTime=now;
 
- if(Math.abs(myVideo.currentTime-expected)>0.08){
-  if(expected>=0&&expected<myVideo.duration){
-   myVideo.currentTime=expected;
+ /* フレーム間隔が極端に長い場合は時間を飛ばさない */
+ delta=Math.min(delta,0.1);
+
+ /* バッファリング中は両動画を一時停止して時計を止める */
+ if(refVideo.readyState<3||myVideo.readyState<3){
+  if(!syncBuffering){
+   refVideo.pause();
+   myVideo.pause();
+   syncBuffering=true;
   }
+
+  rafId=requestAnimationFrame(syncLoop);
+  return;
  }
 
- if(refVideo.ended||myVideo.ended||
- refVideo.currentTime>=refVideo.duration||
- myVideo.currentTime>=myVideo.duration){
+ /* バッファリングから復帰 */
+ if(syncBuffering){
+  syncBuffering=false;
+
+  Promise.all([
+   refVideo.play(),
+   myVideo.play()
+  ]).catch(()=>{
+   pauseBoth();
+  });
+
+  lastFrameTime=performance.now();
+  rafId=requestAnimationFrame(syncLoop);
+  return;
+ }
+
+ syncClock+=delta*syncSpeed;
+
+ const rs=getStart("ref");
+ const ms=getStart("my");
+
+ const refTarget=rs+syncClock;
+ const myTarget=ms+syncClock;
+
+ /* 両動画を共通の経過時間に合わせる */
+ correctVideo(refVideo,refTarget);
+ correctVideo(myVideo,myTarget);
+
+ /* いずれかの動画が終わったら終了 */
+ if(refTarget>=refVideo.duration||myTarget>=myVideo.duration){
   stopBoth();
   updateStatus();
   return;
  }
 
  updateStatus();
+
  rafId=requestAnimationFrame(syncLoop);
+}
+
+/* 時間差が大きい場合だけ補正する */
+function correctVideo(video,target){
+ if(!isFinite(target))return;
+
+ const max=video.duration||0;
+ const safeTarget=Math.max(0,Math.min(max,target));
+ const diff=video.currentTime-safeTarget;
+
+ /* 小さなズレは無視、大きなズレは補正 */
+ if(Math.abs(diff)>0.12){
+  video.currentTime=safeTarget;
+ }
 }
 
 function resetBoth(){
  stopBoth();
- refVideo.currentTime=Math.min(getStart("ref"),refVideo.duration||0);
- myVideo.currentTime=Math.min(getStart("my"),myVideo.duration||0);
+
+ syncClock=0;
+
+ setVideoTime(refVideo,getStart("ref"));
+ setVideoTime(myVideo,getStart("my"));
+
+ document.getElementById("syncSeek").value=0;
+
  updateStatus();
 }
 
 function stepBoth(sec){
  stopBoth();
- refVideo.currentTime=Math.max(0,Math.min(refVideo.duration||0,refVideo.currentTime+sec));
- myVideo.currentTime=Math.max(0,Math.min(myVideo.duration||0,myVideo.currentTime+sec));
+
+ setVideoTime(refVideo,refVideo.currentTime+sec);
+ setVideoTime(myVideo,myVideo.currentTime+sec);
+
  updateStatus();
 }
 
 function individualPlay(which){
  stopBoth();
- (which==="ref"?refVideo:myVideo).play();
+ const v=which==="ref"?refVideo:myVideo;
+ v.play().catch(()=>{});
 }
+
 function individualPause(which){
- (which==="ref"?refVideo:myVideo).pause();
+ const v=which==="ref"?refVideo:myVideo;
+ v.pause();
 }
+
 function individualStep(which,sec){
  stopBoth();
  const v=which==="ref"?refVideo:myVideo;
- v.currentTime=Math.max(0,Math.min(v.duration||0,v.currentTime+sec));
+ setVideoTime(v,v.currentTime+sec);
  updateStatus();
 }
+
 function changeSpeed(){
  const speed=Number(document.getElementById("playSpeed").value);
+
  refVideo.playbackRate=speed;
  myVideo.playbackRate=speed;
+
+ if(syncPlaying){
+  syncSpeed=speed;
+ }
 }
 
 /* 比較スライダー */
@@ -614,21 +735,42 @@ function seekBoth(value){
  const myRemaining=Math.max(0,(myVideo.duration||0)-ms);
  const common=Math.min(refRemaining,myRemaining);
 
- refVideo.currentTime=Math.min(refVideo.duration||0,rs+ratio*common);
- myVideo.currentTime=Math.min(myVideo.duration||0,ms+ratio*common);
+ const offset=ratio*common;
+
+ setVideoTime(refVideo,rs+offset);
+ setVideoTime(myVideo,ms+offset);
+
+ syncClock=offset;
+
  updateStatus();
 }
+
+/* 動画の操作時に同期再生を解除 */
+refVideo.addEventListener("pause",()=>{
+ if(syncPlaying&&!syncBuffering){
+  pauseBoth();
+ }
+});
+
+myVideo.addEventListener("pause",()=>{
+ if(syncPlaying&&!syncBuffering){
+  pauseBoth();
+ }
+});
+
+refVideo.addEventListener("timeupdate",updateStatus);
+myVideo.addEventListener("timeupdate",updateStatus);
+
+refVideo.addEventListener("ended",pauseBoth);
+myVideo.addEventListener("ended",pauseBoth);
 
 function updateStatus(){
  const r=refVideo.currentTime||0;
  const m=myVideo.currentTime||0;
+
  document.getElementById("syncStatus").textContent=
  `お手本 ${r.toFixed(2)}秒 / 自分 ${m.toFixed(2)}秒`;
 }
-refVideo.addEventListener("timeupdate",updateStatus);
-myVideo.addEventListener("timeupdate",updateStatus);
-refVideo.addEventListener("ended",pauseBoth);
-myVideo.addEventListener("ended",pauseBoth);
 
 /* 観察 */
 const observationItems=[
