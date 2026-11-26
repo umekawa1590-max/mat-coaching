@@ -37,6 +37,8 @@ video{width:100%;display:block;max-height:65vh;background:#000}
 .start-row label{font-size:13px;font-weight:bold}
 footer{text-align:center;color:#888;padding:30px}
 .time-label{display:flex;justify-content:space-between;font-size:13px;color:#667085}
+.history-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.history-actions button{margin:0}
 @media(max-width:700px){
  .video-grid{grid-template-columns:1fr}
  .start-row{grid-template-columns:1fr}
@@ -224,6 +226,7 @@ oninput="seekBoth(this.value)">
 <div class="panel">
 <button class="secondary" onclick="goHome()">← 戻る</button>
 <h2>学習履歴</h2>
+<p class="small">各記録の「画像保存」から、学習内容をPNG画像として保存できます。</p>
 <div id="historyList"></div>
 <button class="danger" onclick="clearHistory()">履歴を削除</button>
 </div>
@@ -384,7 +387,7 @@ function showSection(id){
  document.getElementById(id).classList.remove("hidden");
 }
 function escapeHTML(str){
- return String(str).replace(/[&<>"']/g,c=>({
+ return String(str??"").replace(/[&<>"']/g,c=>({
  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
  }[c]));
 }
@@ -900,22 +903,347 @@ function saveRecord(){
  localStorage.setItem("matHistory",JSON.stringify(h));
  alert("練習を保存しました");
 }
+
+/* 学習履歴表示 */
 function showHistory(){
  const h=getHistory();
  const root=document.getElementById("historyList");
  root.innerHTML="";
+
  if(!h.length){
   root.innerHTML="<p>記録はありません。</p>";
  }else{
-  h.forEach(x=>{
+  h.forEach((x,index)=>{
    const d=document.createElement("div");
    d.className="observation";
-   d.innerHTML=`<strong>${escapeHTML(x.skill)}</strong><p>${escapeHTML(x.date)}</p><p>${escapeHTML(x.name||"")}</p><p>${escapeHTML(x.memo||"")}</p>`;
+
+   let html=`
+    <strong>${escapeHTML(x.skill||"技名未設定")}</strong>
+    <p>${escapeHTML(x.date||"")}</p>
+    <p>${escapeHTML(x.name||"")}</p>
+    <p>${escapeHTML(x.memo||"")}</p>
+   `;
+
+   const observations=x.observations||[];
+   const matches=observations.filter(o=>o.result==="match");
+   const diffs=observations.filter(o=>o.result==="diff");
+   const unknown=observations.filter(o=>o.result==="unknown");
+
+   if(matches.length){
+    html+="<p><strong>できている点：</strong>"+matches.map(o=>escapeHTML(o.item)).join("、")+"</p>";
+   }
+   if(diffs.length){
+    html+="<p><strong>改善ポイント：</strong>"+diffs.map(o=>escapeHTML(o.item)).join("、")+"</p>";
+   }
+
+   html+=`
+    <div class="history-actions">
+     <button class="green" onclick="saveHistoryImage(${index})">画像保存</button>
+    </div>
+   `;
+
+   d.innerHTML=html;
    root.appendChild(d);
   });
  }
  showSection("history");
 }
+
+/* 学習履歴をPNG画像として保存 */
+function saveHistoryImage(index){
+ const history=getHistory();
+ const record=history[index];
+
+ if(!record){
+  alert("記録が見つかりませんでした。");
+  return;
+ }
+
+ const observations=record.observations||[];
+ const matches=observations.filter(o=>o.result==="match");
+ const diffs=observations.filter(o=>o.result==="diff");
+ const unknown=observations.filter(o=>o.result==="unknown");
+
+ const canvas=document.createElement("canvas");
+ const ctx=canvas.getContext("2d");
+
+ const width=1000;
+ const padding=64;
+ const contentWidth=width-padding*2;
+
+ const fontFamily='-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif';
+
+ const sections=[];
+
+ sections.push({
+  title:"できている点",
+  color:"#21865b",
+  items:matches.map(o=>({
+   title:o.item,
+   note:o.note||"お手本に近い動きができています。"
+  }))
+ });
+
+ sections.push({
+  title:"改善ポイント",
+  color:"#c0392b",
+  items:diffs.map(o=>({
+   title:o.item,
+   note:o.note||"お手本と自分の動きを見比べ、違いを確認しましょう。"
+  }))
+ });
+
+ sections.push({
+  title:"判断できなかった項目",
+  color:"#667085",
+  items:unknown.map(o=>({
+   title:o.item,
+   note:o.note||"もう一度動画を見返して確認しましょう。"
+  }))
+ });
+
+ function setFont(size,weight="normal"){
+  ctx.font=`${weight} ${size}px ${fontFamily}`;
+ }
+
+ function wrapText(text,maxWidth,fontSize,weight="normal"){
+  setFont(fontSize,weight);
+  const lines=[];
+  let line="";
+
+  for(const char of String(text||"")){
+   const test=line+char;
+   if(line&&ctx.measureText(test).width>maxWidth){
+    lines.push(line);
+    line=char;
+   }else{
+    line=test;
+   }
+  }
+
+  if(line)lines.push(line);
+  return lines.length?lines:[""];
+ }
+
+ function measureRecord(){
+  let y=padding;
+
+  y+=90;
+  y+=20;
+  y+=65;
+  y+=42;
+  y+=35;
+
+  sections.forEach(section=>{
+   if(!section.items.length)return;
+
+   y+=60;
+
+   section.items.forEach(item=>{
+    y+=34;
+    const lines=wrapText(item.note,contentWidth-50,25);
+    y+=lines.length*38;
+    y+=22;
+   });
+
+   y+=15;
+  });
+
+  if(record.memo&&record.memo.trim()){
+   y+=65;
+   const lines=wrapText(record.memo,contentWidth,25);
+   y+=lines.length*40;
+   y+=25;
+  }
+
+  y+=90;
+  return y+padding;
+ }
+
+ const height=measureRecord();
+
+ canvas.width=width;
+ canvas.height=height;
+
+ ctx.fillStyle="#f3f5f8";
+ ctx.fillRect(0,0,width,height);
+
+ /* 背景カード */
+ ctx.fillStyle="#ffffff";
+ roundRect(ctx,25,25,width-50,height-50,24);
+ ctx.fill();
+
+ let y=padding+10;
+
+ /* ヘッダー */
+ ctx.fillStyle="#172b4d";
+ ctx.fillRect(25,25,width-50,110);
+
+ ctx.fillStyle="#ffffff";
+ setFont(34,"bold");
+ ctx.fillText("MAT COACHING",padding,y+15);
+
+ ctx.fillStyle="#dbe6f5";
+ setFont(20);
+ ctx.fillText("学習記録",padding,y+48);
+
+ y+=120;
+
+ /* 技名 */
+ ctx.fillStyle="#172b4d";
+ setFont(34,"bold");
+
+ const skillLines=wrapText(record.skill||"技名未設定",contentWidth,34,"bold");
+ skillLines.forEach(line=>{
+  ctx.fillText(line,padding,y);
+  y+=45;
+ });
+
+ /* 名前・日時 */
+ y+=5;
+ ctx.fillStyle="#667085";
+ setFont(22);
+ ctx.fillText("名前："+(record.name||"未登録"),padding,y);
+ y+=36;
+ ctx.fillText("記録日時："+(record.date||""),padding,y);
+ y+=42;
+
+ /* 区切り線 */
+ ctx.strokeStyle="#e0e5ec";
+ ctx.lineWidth=2;
+ ctx.beginPath();
+ ctx.moveTo(padding,y);
+ ctx.lineTo(width-padding,y);
+ ctx.stroke();
+
+ y+=35;
+
+ /* 各評価項目 */
+ sections.forEach(section=>{
+  if(!section.items.length)return;
+
+  ctx.fillStyle=section.color;
+  setFont(27,"bold");
+  ctx.fillText(section.title,padding,y);
+  y+=45;
+
+  section.items.forEach(item=>{
+   ctx.fillStyle="#222222";
+   setFont(24,"bold");
+   ctx.fillText("● "+item.title,padding+8,y);
+   y+=35;
+
+   ctx.fillStyle="#555f6d";
+   setFont(22);
+   const lines=wrapText(item.note,contentWidth-45,22);
+
+   lines.forEach(line=>{
+    ctx.fillText(line,padding+35,y);
+    y+=34;
+   });
+
+   y+=18;
+  });
+
+  y+=12;
+ });
+
+ /* 気づいたこと */
+ if(record.memo&&record.memo.trim()){
+  ctx.strokeStyle="#e0e5ec";
+  ctx.beginPath();
+  ctx.moveTo(padding,y);
+  ctx.lineTo(width-padding,y);
+  ctx.stroke();
+
+  y+=48;
+
+  ctx.fillStyle="#172b4d";
+  setFont(27,"bold");
+  ctx.fillText("自分の気づき",padding,y);
+  y+=42;
+
+  ctx.fillStyle="#333333";
+  setFont(23);
+
+  const memoLines=wrapText(record.memo,contentWidth,23);
+  memoLines.forEach(line=>{
+   ctx.fillText(line,padding,y);
+   y+=36;
+  });
+ }
+
+ /* フッター */
+ ctx.fillStyle="#667085";
+ setFont(18);
+ ctx.fillText("MAT COACHING  |  学習の振り返り",padding,height-55);
+
+ /* PNG保存 */
+ const safeDate=String(record.date||"record")
+  .replace(/[\\/:*?"<>|]/g,"-")
+  .replace(/\s+/g,"_");
+
+ const safeSkill=String(record.skill||"skill")
+  .replace(/[\\/:*?"<>|]/g,"-");
+
+ const filename=`MAT_COACHING_${safeSkill}_${safeDate}.png`;
+
+ try{
+  if(canvas.toBlob){
+   canvas.toBlob(blob=>{
+    if(!blob){
+     downloadCanvasData(canvas,filename);
+     return;
+    }
+
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setTimeout(()=>URL.revokeObjectURL(url),10000);
+   },"image/png");
+  }else{
+   downloadCanvasData(canvas,filename);
+  }
+ }catch(error){
+  alert("画像を保存できませんでした。ブラウザの設定をご確認ください。");
+ }
+}
+
+/* Canvasの角丸 */
+function roundRect(ctx,x,y,width,height,radius){
+ ctx.beginPath();
+ ctx.moveTo(x+radius,y);
+ ctx.lineTo(x+width-radius,y);
+ ctx.quadraticCurveTo(x+width,y,x+width,y+radius);
+ ctx.lineTo(x+width,y+height-radius);
+ ctx.quadraticCurveTo(x+width,y+height,x+width-radius,y+height);
+ ctx.lineTo(x+radius,y+height);
+ ctx.quadraticCurveTo(x,y+height,x,y+height-radius);
+ ctx.lineTo(x,y+radius);
+ ctx.quadraticCurveTo(x,y,x+radius,y);
+ ctx.closePath();
+}
+
+/* Canvas画像のダウンロード */
+function downloadCanvasData(canvas,filename){
+ try{
+  const dataURL=canvas.toDataURL("image/png");
+  const a=document.createElement("a");
+  a.href=dataURL;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+ }catch(error){
+  alert("画像の保存に失敗しました。別のブラウザでもお試しください。");
+ }
+}
+
 function clearHistory(){
  if(confirm("学習履歴をすべて削除しますか？")){
   localStorage.removeItem("matHistory");
