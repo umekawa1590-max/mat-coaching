@@ -120,6 +120,22 @@ footer{text-align:center;color:#888;padding:30px}
  margin:8px 0 0;
 }
 
+/* 次回の練習目標 */
+.next-goal-panel{
+ background:#f5f8ff;
+ border:1px solid #d8e4f7;
+ border-radius:12px;
+ padding:16px;
+ margin-top:16px;
+}
+.next-goal-panel h3{
+ color:#172b4d;
+ margin-top:0;
+}
+.next-goal-panel textarea{
+ min-height:110px;
+}
+
 @media(max-width:700px){
  .video-grid{grid-template-columns:1fr}
  .start-row{grid-template-columns:1fr}
@@ -309,6 +325,16 @@ footer{text-align:center;color:#888;padding:30px}
 
 <button class="green" onclick="generateAdvice()">動作分析アドバイスを生成</button>
 <div id="adviceResult" style="margin-top:16px"></div>
+
+<!-- 追加：次回から意識したいこと -->
+<div class="next-goal-panel">
+ <h3>次回から意識していきたいこと</h3>
+ <p>AIの分析や自分の振り返りを踏まえて、次の練習で意識したいことを書きましょう。</p>
+ <textarea
+  id="nextGoal"
+  placeholder="例：手でマットを強く押すことを意識する。回転中も膝を伸ばす。着地した後に姿勢を止める。"></textarea>
+</div>
+
 </div>
 
 <div class="panel">
@@ -1113,11 +1139,6 @@ ${memo||"記入なし"}
 
 /*
  Geminiを直接開く処理
-
- 重要：
- window.open()をクリック直後に実行します。
- awaitやnavigator.shareなどの非同期処理より先に開くことで、
- iPhone・iPadのポップアップ制限を受けにくくします。
 */
 function openGeminiAnalysis(){
  const status=document.getElementById("geminiStatus");
@@ -1126,15 +1147,8 @@ function openGeminiAnalysis(){
 
  status.textContent="Geminiを開いています。";
 
- /*
- クリック操作の直後に新しいタブを開く。
- 非同期処理を先に実行しないことがポイントです。
- */
  const geminiWindow=window.open(geminiURL,"_blank");
 
- /*
- ポップアップがブロックされた場合は同じタブで開く。
- */
  if(!geminiWindow){
   copyPromptInBackground(prompt);
   status.textContent="Geminiを開いています。開いた後、分析指示文を貼り付けてください。";
@@ -1142,22 +1156,13 @@ function openGeminiAnalysis(){
   return;
  }
 
- /*
- Geminiを開いた後に指示文をコピーする。
- */
  copyPromptInBackground(prompt);
 
  status.textContent=
   "Geminiを開きました。分析指示文をコピーしています。Geminiの入力欄に貼り付けてください。";
 }
 
-/*
- 動画と分析指示文を共有する処理
-
- この関数は共有ボタンを押した瞬間に呼び出します。
- navigator.share()をクリック操作から直接実行することで、
- iOSの共有メニューを起動しやすくします。
-*/
+/* 動画と分析指示文を共有 */
 async function shareVideoWithGemini(){
  const status=document.getElementById("geminiStatus");
  const prompt=createGeminiPrompt();
@@ -1191,10 +1196,6 @@ async function shareVideoWithGemini(){
  try{
   status.textContent="動画と分析指示文を共有メニューに渡しています。";
 
-  /*
-   ここでは先にwindow.open()を呼ばない。
-   共有メニューを出すため、クリック直後にshareを実行する。
-  */
   await navigator.share(shareData);
 
   status.textContent="共有メニューを閉じました。Geminiを選択した場合は、動画が添付されているか確認してください。";
@@ -1302,6 +1303,7 @@ function saveRecord(){
   name:student,
   skill:currentSkill,
   memo:document.getElementById("studentMemo").value,
+  nextGoal:document.getElementById("nextGoal").value,
   observations:observationItems.map((item,i)=>({
    item,
    result:document.getElementById("obs"+i).value,
@@ -1343,6 +1345,15 @@ function showHistory(){
    }
    if(diffs.length){
     html+="<p><strong>改善ポイント：</strong>"+diffs.map(o=>escapeHTML(o.item)).join("、")+"</p>";
+   }
+
+   if(x.nextGoal){
+    html+=`
+     <div class="next-goal-panel">
+      <h3>次回から意識していきたいこと</h3>
+      <p>${escapeHTML(x.nextGoal).replace(/\n/g,"<br>")}</p>
+     </div>
+    `;
    }
 
    html+=`
@@ -1465,6 +1476,14 @@ function saveHistoryImage(index){
    y+=25;
   }
 
+  /* 次回から意識したいことの高さを追加 */
+  if(record.nextGoal&&record.nextGoal.trim()){
+   y+=65;
+   const lines=wrapText(record.nextGoal,contentWidth,25);
+   y+=lines.length*40;
+   y+=25;
+  }
+
   y+=90;
   return y+padding;
  }
@@ -1570,6 +1589,31 @@ function saveHistoryImage(index){
 
   const memoLines=wrapText(record.memo,contentWidth,23);
   memoLines.forEach(line=>{
+   ctx.fillText(line,padding,y);
+   y+=36;
+  });
+ }
+
+ /* 次回から意識したいことを画像に追加 */
+ if(record.nextGoal&&record.nextGoal.trim()){
+  ctx.strokeStyle="#e0e5ec";
+  ctx.beginPath();
+  ctx.moveTo(padding,y);
+  ctx.lineTo(width-padding,y);
+  ctx.stroke();
+
+  y+=48;
+
+  ctx.fillStyle="#172b4d";
+  setFont(27,"bold");
+  ctx.fillText("次回から意識していきたいこと",padding,y);
+  y+=42;
+
+  ctx.fillStyle="#333333";
+  setFont(23);
+
+  const goalLines=wrapText(record.nextGoal,contentWidth,23);
+  goalLines.forEach(line=>{
    ctx.fillText(line,padding,y);
    y+=36;
   });
