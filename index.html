@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -91,6 +90,27 @@ footer{text-align:center;color:#888;padding:30px}
  margin:10px 0 0;
 }
 
+/* 録画動画保存 */
+.camera-save-panel{
+ background:#f0f8f4;
+ border:1px solid #cce6d7;
+ border-radius:12px;
+ padding:14px;
+ margin-top:14px;
+}
+.camera-save-button{
+ width:100%;
+ padding:15px;
+ font-size:16px;
+ background:#21865b;
+}
+.camera-save-note{
+ font-size:12px;
+ color:#526078;
+ line-height:1.6;
+ margin:8px 0 0;
+}
+
 @media(max-width:700px){
  .video-grid{grid-template-columns:1fr}
  .start-row{grid-template-columns:1fr}
@@ -153,43 +173,25 @@ footer{text-align:center;color:#888;padding:30px}
 <h2>同時再生コントロール</h2>
 
 <div class="start-row">
-
 <div>
 <label>お手本動画 開始位置（秒）</label>
-<input type="number" id="refStart" value="0" min="0" step="0.1"
-oninput="syncStartSlider('ref')">
-
-<input type="range" id="refStartSlider"
-min="0" max="1000" value="0" step="1"
-oninput="moveStartSlider('ref',this.value)">
-
+<input type="number" id="refStart" value="0" min="0" step="0.1" oninput="syncStartSlider('ref')">
+<input type="range" id="refStartSlider" min="0" max="1000" value="0" step="1" oninput="moveStartSlider('ref',this.value)">
 <div class="time-label">
 <span>0秒</span><span id="refDurationLabel">0秒</span>
 </div>
-
-<button class="secondary" onclick="setStartFromCurrent('ref')">
-現在位置を開始位置に設定
-</button>
+<button class="secondary" onclick="setStartFromCurrent('ref')">現在位置を開始位置に設定</button>
 </div>
 
 <div>
 <label>自分の動画 開始位置（秒）</label>
-<input type="number" id="myStart" value="0" min="0" step="0.1"
-oninput="syncStartSlider('my')">
-
-<input type="range" id="myStartSlider"
-min="0" max="1000" value="0" step="1"
-oninput="moveStartSlider('my',this.value)">
-
+<input type="number" id="myStart" value="0" min="0" step="0.1" oninput="syncStartSlider('my')">
+<input type="range" id="myStartSlider" min="0" max="1000" value="0" step="1" oninput="moveStartSlider('my',this.value)">
 <div class="time-label">
 <span>0秒</span><span id="myDurationLabel">0秒</span>
 </div>
-
-<button class="secondary" onclick="setStartFromCurrent('my')">
-現在位置を開始位置に設定
-</button>
+<button class="secondary" onclick="setStartFromCurrent('my')">現在位置を開始位置に設定</button>
 </div>
-
 </div>
 
 <div class="controls" style="margin-top:12px">
@@ -215,8 +217,7 @@ oninput="moveStartSlider('my',this.value)">
 
 <div style="margin-top:12px">
 <label>比較再生位置</label>
-<input type="range" id="syncSeek" min="0" max="1000" value="0"
-oninput="seekBoth(this.value)">
+<input type="range" id="syncSeek" min="0" max="1000" value="0" oninput="seekBoth(this.value)">
 <p class="small" id="syncStatus">動画を読み込んでください。</p>
 </div>
 </div>
@@ -263,7 +264,6 @@ oninput="seekBoth(this.value)">
 <h3>気づいたこと</h3>
 <textarea id="studentMemo" placeholder="自分の動きで気づいたこと、意識したことなど"></textarea>
 
-<!-- Gemini動画分析リンク：自分の気づきの直下 -->
 <div class="gemini-panel">
  <div class="gemini-heading">
   <span class="gemini-icon">✦</span>
@@ -339,13 +339,31 @@ oninput="seekBoth(this.value)">
 <button class="secondary" onclick="goHome()">← 戻る</button>
 <h2>カメラ撮影</h2>
 <video id="cameraVideo" autoplay playsinline></video>
+
 <div class="controls">
 <button onclick="startCamera()">カメラ起動</button>
 <button onclick="switchCamera()">カメラ切替</button>
 <button class="green" onclick="startRecording()">録画開始</button>
 <button class="danger" onclick="stopRecording()">録画停止</button>
 </div>
-<div id="cameraStatus"></div>
+
+<div id="cameraStatus" aria-live="polite"></div>
+
+<!-- 録画停止後に表示する保存ボタン -->
+<div id="cameraSavePanel" class="camera-save-panel hidden">
+ <h3>撮影した動画を保存</h3>
+ <p>録画した動画を写真アプリに保存できます。</p>
+ <button
+  id="saveRecordedVideoButton"
+  class="camera-save-button"
+  onclick="saveRecordedVideoToPhotos()">
+  写真アプリに保存
+ </button>
+ <p class="camera-save-note">
+  ボタンを押すと共有メニューが開きます。共有メニューから「ビデオを保存」を選んでください。
+ </p>
+</div>
+
 </div>
 </section>
 
@@ -390,12 +408,10 @@ let mediaRecorder=null;
 let recordedChunks=[];
 let cameraFacing="environment";
 
-/* 録画動画の保持 */
 let recordedVideoBlob=null;
 let recordedVideoFile=null;
 let recordedVideoURL=null;
 
-/* 同期再生用 */
 let syncClock=0;
 let lastFrameTime=0;
 let syncSpeed=1;
@@ -1053,7 +1069,6 @@ async function openGeminiAnalysis(){
 
  status.textContent="共有の準備をしています。";
 
- /* 録画動画がある場合は動画と指示文を共有する */
  if(recordedVideoFile){
   try{
    const shareData={
@@ -1063,13 +1078,8 @@ async function openGeminiAnalysis(){
    };
 
    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[recordedVideoFile]})){
-    /*
-     * 共有処理はクリック直後に開始する必要があるため、
-     * navigator.shareを先に呼び出す
-     */
     const sharePromise=navigator.share(shareData);
 
-    /* 従来のコピー機能も維持 */
     copyPromptInBackground(prompt);
 
     status.textContent="動画と分析用の指示文を共有メニューに渡しました。Geminiを選択してください。";
@@ -1093,7 +1103,6 @@ async function openGeminiAnalysis(){
   }
  }
 
- /* 共有に対応しない場合は従来のGemini起動・コピー方式 */
  status.textContent=recordedVideoFile
   ?"この環境では動画の直接共有に対応していません。Geminiを開きます。"
   :"アプリ内に録画動画がありません。Geminiを開きます。";
@@ -1247,7 +1256,6 @@ function showHistory(){
    const observations=x.observations||[];
    const matches=observations.filter(o=>o.result==="match");
    const diffs=observations.filter(o=>o.result==="diff");
-   const unknown=observations.filter(o=>o.result==="unknown");
 
    if(matches.length){
     html+="<p><strong>できている点：</strong>"+matches.map(o=>escapeHTML(o.item)).join("、")+"</p>";
@@ -1643,6 +1651,7 @@ async function startCamera(){
   alert("カメラを起動できませんでした。ブラウザのアクセス許可を確認してください。");
  }
 }
+
 async function switchCamera(){
  cameraFacing=cameraFacing==="environment"?"user":"environment";
  await startCamera();
@@ -1680,6 +1689,9 @@ function startRecording(){
  recordedChunks=[];
  recordedVideoBlob=null;
  recordedVideoFile=null;
+
+ /* 新しい録画を始めたら保存ボタンを隠す */
+ document.getElementById("cameraSavePanel").classList.add("hidden");
 
  const status=document.getElementById("cameraStatus");
  status.textContent="録画を開始しています。";
@@ -1719,29 +1731,23 @@ function startRecording(){
     console.error("動画ファイル作成エラー:",error);
    }
 
-   /* 以前の動画URLを解放 */
    if(recordedVideoURL){
     URL.revokeObjectURL(recordedVideoURL);
    }
 
    recordedVideoURL=URL.createObjectURL(recordedVideoBlob);
 
-   /* 従来どおり端末にも保存 */
-   const a=document.createElement("a");
-   a.href=recordedVideoURL;
-   a.download=filename;
-   document.body.appendChild(a);
-   a.click();
-   a.remove();
-
    const sizeMB=(recordedVideoBlob.size/(1024*1024)).toFixed(1);
 
    if(recordedVideoFile){
     status.textContent=
-     `録画完了：動画を保存しました（${sizeMB}MB）。Gemini分析ボタンから動画を共有できます。`;
+     `録画完了（${sizeMB}MB）。下のボタンから写真アプリに保存できます。`;
+
+    /* 録画完了後に保存ボタンを表示 */
+    document.getElementById("cameraSavePanel").classList.remove("hidden");
    }else{
     status.textContent=
-     "録画は完了しましたが、共有用ファイルを作成できませんでした。保存した動画を手動で添付してください。";
+     "録画は完了しましたが、共有用ファイルを作成できませんでした。もう一度撮影してください。";
    }
 
    recordedChunks=[];
@@ -1762,6 +1768,67 @@ function stopRecording(){
   mediaRecorder.stop();
   document.getElementById("cameraStatus").textContent="動画を保存しています...";
  }
+}
+
+/*
+ * 録画停止後に写真アプリへ保存する
+ * iOSでは共有メニューが開くので、
+ * ユーザーが「ビデオを保存」を選択する
+ */
+async function saveRecordedVideoToPhotos(){
+ const status=document.getElementById("cameraStatus");
+
+ if(!recordedVideoFile){
+  alert("保存できる録画動画がありません。先に動画を撮影してください。");
+  return;
+ }
+
+ if(
+  navigator.share&&
+  navigator.canShare&&
+  navigator.canShare({files:[recordedVideoFile]})
+ ){
+  try{
+   await navigator.share({
+    title:"MAT COACHING 撮影動画",
+    files:[recordedVideoFile]
+   });
+
+   status.textContent="共有メニューを閉じました。写真アプリに保存されたか確認してください。";
+  }catch(error){
+   if(error.name==="AbortError"){
+    status.textContent="保存をキャンセルしました。もう一度ボタンを押すと再度共有できます。";
+   }else{
+    console.error("動画共有エラー:",error);
+    status.textContent="共有メニューを開けませんでした。動画をダウンロードします。";
+    downloadRecordedVideo();
+   }
+  }
+ }else{
+  status.textContent="この環境では共有メニューに対応していないため、動画をダウンロードします。";
+  downloadRecordedVideo();
+ }
+}
+
+/* 共有に対応していない場合のダウンロード */
+function downloadRecordedVideo(){
+ if(!recordedVideoBlob)return;
+
+ const actualType=recordedVideoBlob.type||"video/webm";
+ const extension=actualType.toLowerCase().includes("mp4")?"mp4":"webm";
+ const filename="mat-coaching-video."+extension;
+
+ const url=recordedVideoURL||URL.createObjectURL(recordedVideoBlob);
+ const a=document.createElement("a");
+
+ a.href=url;
+ a.download=filename;
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+
+ document.getElementById("cameraStatus").textContent=
+  "動画をダウンロードしました。写真アプリへは、ファイルアプリから動画を開いて共有してください。";
 }
 
 /* カメラ停止 */
