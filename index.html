@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -492,6 +493,110 @@ function getHistory(){
  return JSON.parse(localStorage.getItem("matHistory")||"[]");
 }
 
+/* お手本動画をIndexedDBに保存する */
+const REF_DB_NAME="MAT_COACHING_VIDEO_DB";
+const REF_STORE_NAME="referenceVideos";
+
+function openReferenceDB(){
+ return new Promise((resolve,reject)=>{
+  if(!window.indexedDB){
+   reject(new Error("このブラウザではIndexedDBを利用できません。"));
+   return;
+  }
+
+  const request=indexedDB.open(REF_DB_NAME,1);
+
+  request.onupgradeneeded=()=>{
+   const db=request.result;
+
+   if(!db.objectStoreNames.contains(REF_STORE_NAME)){
+    db.createObjectStore(REF_STORE_NAME,{keyPath:"id"});
+   }
+  };
+
+  request.onsuccess=()=>resolve(request.result);
+  request.onerror=()=>reject(request.error||new Error("データベースを開けませんでした。"));
+ });
+}
+
+async function saveReferenceBlob(id,file){
+ const db=await openReferenceDB();
+
+ return new Promise((resolve,reject)=>{
+  const transaction=db.transaction(REF_STORE_NAME,"readwrite");
+
+  transaction.objectStore(REF_STORE_NAME).put({
+   id:id,
+   blob:file
+  });
+
+  transaction.oncomplete=()=>{
+   db.close();
+   resolve(true);
+  };
+
+  transaction.onerror=()=>{
+   const error=transaction.error;
+   db.close();
+   reject(error||new Error("動画を保存できませんでした。"));
+  };
+
+  transaction.onabort=()=>{
+   const error=transaction.error;
+   db.close();
+   reject(error||new Error("動画の保存が中断されました。"));
+  };
+ });
+}
+
+async function getReferenceBlob(id){
+ const db=await openReferenceDB();
+
+ return new Promise((resolve,reject)=>{
+  const transaction=db.transaction(REF_STORE_NAME,"readonly");
+  const request=transaction.objectStore(REF_STORE_NAME).get(id);
+
+  request.onsuccess=()=>{
+   const result=request.result;
+   db.close();
+   resolve(result?result.blob:null);
+  };
+
+  request.onerror=()=>{
+   const error=request.error;
+   db.close();
+   reject(error||new Error("動画を読み込めませんでした。"));
+  };
+ });
+}
+
+async function deleteReferenceBlob(id){
+ const db=await openReferenceDB();
+
+ return new Promise((resolve,reject)=>{
+  const transaction=db.transaction(REF_STORE_NAME,"readwrite");
+
+  transaction.objectStore(REF_STORE_NAME).delete(id);
+
+  transaction.oncomplete=()=>{
+   db.close();
+   resolve(true);
+  };
+
+  transaction.onerror=()=>{
+   const error=transaction.error;
+   db.close();
+   reject(error||new Error("動画を削除できませんでした。"));
+  };
+
+  transaction.onabort=()=>{
+   const error=transaction.error;
+   db.close();
+   reject(error||new Error("動画の削除が中断されました。"));
+  };
+ });
+}
+
 function renderSkills(){
  const grid=document.getElementById("skillGrid");
  grid.innerHTML="";
@@ -515,7 +620,6 @@ function selectSkill(skill){
 function renderTeacherSkills(){
  const sel=document.getElementById("teacherSkill");
 
- /* 生徒配布用HTMLでは先生用の選択欄が存在しない */
  if(!sel)return;
 
  sel.innerHTML="";
@@ -547,7 +651,6 @@ function goHome(){
 function showSection(id){
  let allowed=["home","analysis","history","teacher","camera"];
 
- /* 生徒配布用HTMLでは先生ページを画面遷移の対象から除外 */
  if(window.MAT_STUDENT_MODE){
   allowed=["home","analysis","history","camera"];
  }
@@ -617,6 +720,60 @@ function loadVideoFile(file,video){
 
  video.onloadedmetadata=()=>updateDurationSlider(video);
 }
+
+/* 登録済みのお手本動画を選択 */
+document.getElementById("refSelect").addEventListener("change",async e=>{
+ const index=e.target.value;
+
+ if(index==="")return;
+
+ const list=getRefs().filter(r=>r.skill===currentSkill);
+ const item=list[index];
+
+ if(!item)return;
+
+ try{
+  stopBoth();
+
+  let url=item.url||null;
+
+  if(item.id){
+   const blob=await getReferenceBlob(item.id);
+
+   if(!blob){
+    alert("登録済みのお手本動画を読み込めませんでした。");
+    return;
+   }
+
+   url=URL.createObjectURL(blob);
+  }
+
+  if(!url){
+   alert("動画データが見つかりませんでした。");
+   return;
+  }
+
+  if(refVideo.dataset.objectUrl){
+   URL.revokeObjectURL(refVideo.dataset.objectUrl);
+   delete refVideo.dataset.objectUrl;
+  }
+
+  if(url.startsWith("blob:")){
+   refVideo.dataset.objectUrl=url;
+  }
+
+  refVideo.src=url;
+  refVideo.load();
+
+  refVideo.onloadedmetadata=()=>{
+   updateDurationSlider(refVideo);
+  };
+
+ }catch(error){
+  console.error("お手本動画読み込みエラー:",error);
+  alert("お手本動画を読み込めませんでした。");
+ }
+});
 
 function updateDurationSlider(video){
  const isRef=video===refVideo;
@@ -694,26 +851,6 @@ function updateRefSelect(){
   sel.appendChild(o);
  });
 }
-
-document.getElementById("refSelect").addEventListener("change",e=>{
- const index=e.target.value;
-
- if(index==="")return;
-
- const list=getRefs().filter(r=>r.skill===currentSkill);
- const item=list[index];
-
- if(item){
-  stopBoth();
-
-  refVideo.src=item.url;
-  refVideo.load();
-
-  refVideo.onloadedmetadata=()=>{
-   updateDurationSlider(refVideo);
-  };
- }
-});
 
 function getStart(which){
  const input=document.getElementById(which==="ref"?"refStart":"myStart");
@@ -1796,7 +1933,6 @@ function clearHistory(){
 /* 先生ページ */
 function teacherLogin(){
 
- /* 生徒配布用HTMLでは先生ページを開けない */
  if(window.MAT_STUDENT_MODE){
   alert("先生ページは利用できません。");
   return;
@@ -1843,22 +1979,19 @@ function addSkill(){
  alert("技を追加しました");
 }
 
-/* 動画ファイルをData URLに変換 */
+/* BlobをData URLに変換する（生徒用HTML書き出し時のみ使用） */
 function blobToDataURL(blob){
  return new Promise((resolve,reject)=>{
   const reader=new FileReader();
 
   reader.onload=()=>resolve(reader.result);
-  reader.onerror=()=>reject(reader.error);
+  reader.onerror=()=>reject(reader.error||new Error("動画の変換に失敗しました。"));
 
   reader.readAsDataURL(blob);
  });
 }
 
-/*
- お手本動画は登録時にData URLとして保存する。
- これにより、ページを再読み込みした後も動画を保持しやすくする。
-*/
+/* お手本動画をIndexedDBに登録 */
 async function registerReference(){
  const file=document.getElementById("teacherVideo").files[0];
  const skill=document.getElementById("teacherSkill").value;
@@ -1869,6 +2002,11 @@ async function registerReference(){
   return;
  }
 
+ if(file.type&&!file.type.startsWith("video/")){
+  alert("動画ファイルを選択してください。");
+  return;
+ }
+
  const button=document.querySelector('#teacher button[onclick="registerReference()"]');
 
  if(button){
@@ -1876,15 +2014,22 @@ async function registerReference(){
   button.textContent="動画を保存しています...";
  }
 
- try{
-  const dataURL=await blobToDataURL(file);
+ let savedId=null;
 
+ try{
+  const id="ref_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+
+  /* 動画本体をIndexedDBに保存 */
+  await saveReferenceBlob(id,file);
+  savedId=id;
+
+  /* localStorageには動画本体を入れず、情報だけ保存 */
   const refs=getRefs();
 
   refs.push({
+   id:id,
    name:name||file.name,
-   skill,
-   url:dataURL,
+   skill:skill,
    fileName:file.name,
    type:file.type||"video/mp4",
    size:file.size
@@ -1897,12 +2042,35 @@ async function registerReference(){
   document.getElementById("teacherVideo").value="";
   document.getElementById("refName").value="";
 
-  alert("お手本動画を登録しました。");
+  const sizeMB=(file.size/(1024*1024)).toFixed(1);
+
+  alert("お手本動画を登録しました。\n動画サイズ："+sizeMB+"MB");
 
  }catch(error){
   console.error("お手本動画の登録エラー:",error);
 
-  alert("動画を保存できませんでした。動画ファイルの容量を確認してください。");
+  if(savedId){
+   try{
+    await deleteReferenceBlob(savedId);
+   }catch(cleanupError){
+    console.warn("保存失敗後の動画データ削除エラー:",cleanupError);
+   }
+  }
+
+  let message="動画を保存できませんでした。";
+
+  if(error&&error.name==="QuotaExceededError"){
+   message="端末の保存容量が不足しています。";
+  }else if(!window.indexedDB){
+   message="このブラウザでは動画の保存機能を利用できません。";
+  }else if(error&&error.message){
+   message=error.message;
+  }
+
+  alert(
+   message+
+   "\n\nブラウザの空き容量や設定を確認してください。"
+  );
 
  }finally{
   if(button){
@@ -1934,15 +2102,32 @@ function renderRegisteredRefs(){
  });
 }
 
-function deleteRef(i){
+/* 登録動画を削除 */
+async function deleteRef(i){
  const refs=getRefs();
+ const target=refs[i];
 
- refs.splice(i,1);
+ if(!target)return;
 
- saveRefs(refs);
+ if(!confirm("このお手本動画を削除しますか？"))return;
 
- renderRegisteredRefs();
- updateRefSelect();
+ try{
+  if(target.id){
+   await deleteReferenceBlob(target.id);
+  }
+
+  refs.splice(i,1);
+  saveRefs(refs);
+
+  renderRegisteredRefs();
+  updateRefSelect();
+
+  alert("お手本動画を削除しました。");
+
+ }catch(error){
+  console.error("動画削除エラー:",error);
+  alert("動画を削除できませんでした。");
+ }
 }
 
 /* 生徒配布用HTMLの書き出し */
@@ -1959,6 +2144,7 @@ async function exportStudentHTML(){
 
  try{
   const embeddedRefs=[];
+  let totalBytes=0;
 
   for(let i=0;i<refs.length;i++){
    const ref=refs[i];
@@ -1966,60 +2152,75 @@ async function exportStudentHTML(){
    status.textContent=
     `動画を準備しています（${i+1}/${refs.length}）：${ref.name}`;
 
-   let dataURL=ref.url;
+   let videoBlob=null;
+   let dataURL=ref.url||null;
 
-   /*
-    すでにData URLならそのまま使用する。
-    以前の形式のBlob URLの場合は、読み込み可能なら変換する。
-   */
-   if(typeof dataURL==="string"&&dataURL.startsWith("blob:")){
+   if(ref.id){
+    videoBlob=await getReferenceBlob(ref.id);
+
+    if(!videoBlob){
+     throw new Error("保存された動画が見つかりません："+ref.name);
+    }
+
+    dataURL=await blobToDataURL(videoBlob);
+
+   }else if(typeof dataURL==="string"&&dataURL.startsWith("blob:")){
     const response=await fetch(dataURL);
 
     if(!response.ok){
      throw new Error("動画を読み込めませんでした："+ref.name);
     }
 
-    const videoBlob=await response.blob();
+    videoBlob=await response.blob();
     dataURL=await blobToDataURL(videoBlob);
-   }
 
-   if(typeof dataURL!=="string"||!dataURL.startsWith("data:")){
+   }else if(typeof dataURL==="string"&&dataURL.startsWith("data:")){
+    videoBlob=await (await fetch(dataURL)).blob();
+
+   }else{
     throw new Error("動画データが正しく保存されていません："+ref.name);
    }
+
+   totalBytes+=videoBlob.size;
 
    embeddedRefs.push({
     name:ref.name,
     skill:ref.skill,
     url:dataURL,
     fileName:ref.fileName||"reference-video",
-    type:ref.type||"video/mp4"
+    type:ref.type||videoBlob.type||"video/mp4"
    });
   }
 
-  /*
-   現在の画面状態に影響されないようHTML全体を複製する
-  */
+  const totalMB=(totalBytes/(1024*1024)).toFixed(1);
+
+  if(totalBytes>100*1024*1024){
+   if(!confirm(
+    "埋め込む動画の合計容量は約"+totalMB+"MBです。\n"+
+    "生徒用HTMLのファイルサイズが大きくなります。\n"+
+    "このまま書き出しますか？"
+   )){
+    status.textContent="書き出しをキャンセルしました。";
+    return;
+   }
+  }
+
+  /* 現在の画面状態に影響されないようHTML全体を複製 */
   const clone=document.documentElement.cloneNode(true);
 
-  /*
-   生徒用HTMLから先生ページのボタンを削除する
-  */
+  /* 生徒用HTMLから先生ページのボタンを削除 */
   clone.querySelectorAll('button[onclick="teacherLogin()"]').forEach(button=>{
    button.remove();
   });
 
-  /*
-   先生ページそのものを削除する
-  */
+  /* 先生ページそのものを削除 */
   const teacherSection=clone.querySelector("#teacher");
 
   if(teacherSection){
    teacherSection.remove();
   }
 
-  /*
-   生徒用HTMLは必ずホーム画面から始める
-  */
+  /* 生徒用HTMLは必ずホーム画面から始める */
   const sections=["home","analysis","history","camera"];
 
   sections.forEach(id=>{
@@ -2034,12 +2235,8 @@ async function exportStudentHTML(){
    }
   });
 
-  /*
-   生徒用モードを有効にする。
-   先生ページへの画面遷移も禁止する。
-  */
+  /* 生徒用モードを有効にする */
   const studentModeMarker="window.MAT_STUDENT_MODE = false;";
-
   const embeddedMarker="window.MAT_EMBEDDED_REFS = null;";
 
   let originalHTML="<!DOCTYPE html>\n"+clone.outerHTML;
@@ -2094,13 +2291,12 @@ async function exportStudentHTML(){
  }catch(error){
   console.error("HTML書き出しエラー:",error);
 
-  status.textContent=
-   "書き出しに失敗しました。動画を確認してから再度お試しください。";
+  status.textContent="書き出しに失敗しました。";
 
   alert(
    "HTMLを書き出せませんでした。\n"+
-   "登録した動画が読み込めるか、動画の容量が大きすぎないか確認してください。\n\n"+
-   error.message
+   "動画が保存されているか確認してください。\n\n"+
+   (error.message||"不明なエラー")
   );
  }
 }
@@ -2128,9 +2324,6 @@ async function startCamera(){
     audio:true
    });
   }catch(audioError){
-   /*
-    マイクの利用が許可されない場合は映像のみで起動する
-   */
    cameraStream=await navigator.mediaDevices.getUserMedia({
     video:videoConstraints,
     audio:false
@@ -2379,7 +2572,7 @@ function stopCamera(){
 loadName();
 renderSkills();
 
-/* 生徒配布用HTMLでは先生ページへの入口を念のため非表示にする */
+/* 生徒配布用HTMLでは先生ページへの入口を非表示にする */
 if(window.MAT_STUDENT_MODE){
  const teacherButton=document.querySelector('button[onclick="teacherLogin()"]');
 
